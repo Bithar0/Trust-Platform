@@ -1,998 +1,1639 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tradeginger - Buy & Sell Locally</title>
+    <title>TrustFirst | The Executive Network</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <!-- Supabase Client Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa; /* Softer, off-white background */
-        }
-        .hero-section {
-            background: linear-gradient(rgba(26, 32, 44, 0.7), rgba(26, 32, 44, 0.7)), url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2069&auto=format&fit=crop') no-repeat center center;
-            background-size: cover;
-            position: relative;
-            overflow: hidden;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        #sellModal .modal-content::-webkit-scrollbar, #loginModal .modal-content::-webkit-scrollbar, #tncModal .modal-content::-webkit-scrollbar, #chat-messages::-webkit-scrollbar { width: 8px; }
-        #sellModal .modal-content::-webkit-scrollbar-track, #loginModal .modal-content::-webkit-scrollbar-track, #tncModal .modal-content::-webkit-scrollbar-track, #chat-messages::-webkit-scrollbar-track { background: #f1f1f1; }
-        #sellModal .modal-content::-webkit-scrollbar-thumb, #loginModal .modal-content::-webkit-scrollbar-thumb, #tncModal .modal-content::-webkit-scrollbar-thumb, #chat-messages::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        #sellModal .modal-content::-webkit-scrollbar-thumb:hover, #loginModal .modal-content::-webkit-scrollbar-thumb:hover, #tncModal .modal-content::-webkit-scrollbar-thumb:hover { background: #555; }
-       
-        /* Dropdown CSS */
-        .profile-dropdown, .category-dropdown, #notification-dropdown { display: none; }
-        .profile-button:focus-within .profile-dropdown, .category-item:hover > .category-dropdown { display: block; }
-
-        /* --- NEW Professional & Classy Theme Colors --- */
-        .theme-primary { color: #1a202c; /* Deep Charcoal */ }
-        .theme-accent { color: #b79438; /* Refined Gold */ }
-        .bg-theme-primary { background-color: #1a202c; }
-        .hover\:bg-theme-primary-dark:hover { background-color: #11151c; }
-        .bg-theme-accent { background-color: #b79438; }
-        .hover\:bg-theme-accent-dark:hover { background-color: #a08130; }
-        .text-theme-accent { color: #b79438; }
-        .hover\:text-theme-accent:hover { color: #a08130; }
-        .focus\:ring-theme-accent:focus { --tw-ring-color: #b79438; }
-        .border-theme-accent { border-color: #b79438; }
-       
-        .beer-cap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 35px;
-            height: 35px;
-            background-color: #1a202c; /* New Primary */
-            color: #b79438; /* New Accent */
-            border-radius: 50%;
-            font-size: 1rem;
-            box-shadow: 0 0 0 2px #f8f9fa, 0 0 0 3px #aaa, inset 0 1px 3px rgba(0,0,0,0.4);
-            transition: transform 0.2s ease-in-out;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .beer-cap:hover {
-            transform: scale(1.1) rotate(5deg) !important;
-        }
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
-        details[open] summary .accordion-icon { transform: rotate(180deg); }
-        .notification-dot {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: red;
-        }
-        .premium-tag {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background-color: #b79438; /* Gold */
-            color: #1a202c; /* Charcoal */
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-
-        /* Dashboard Styles */
-        .dashboard-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 1rem;
-        }
-        .card {
-          background: #e8f4fd;
-          padding: 1rem;
-          border-radius: 8px;
-          box-shadow: 0 0 5px rgba(0,0,0,0.1);
-        }
-    </style>
-</head>
-<body class="text-gray-800">
-
-    <!-- Header Section (Logged-out state) -->
-    <header id="header-logged-out" class="bg-white shadow-md sticky top-0 z-50">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="#" onclick="showHomepage(event)" class="flex items-center space-x-2">
-                        <svg class="h-8 w-8" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                            <g>
-                                <path d="M50 10 C 27.9 10, 10 27.9, 10 50 C 10 72.1, 27.9 90, 50 90 C 72.1 90, 90 72.1, 90 50 C 90 27.9, 72.1 10, 50 10 Z M 50 15 C 69.3 15, 85 30.7, 85 50 C 85 69.3, 69.3 85, 50 85 C 30.7 85, 15 69.3, 15 50 C 15 30.7, 30.7 15, 50 15 Z" fill="#1a202c"/>
-                                <path d="M 40 30 L 60 30 L 60 50 L 50 50 L 50 70 L 40 70 Z" fill="#b79438"/>
-                                <path d="M 65 55 C 65 63.3, 58.3 70, 50 70 C 41.7 70, 35 63.3, 35 55 L 45 55 C 45 57.8, 47.2 60, 50 60 C 52.8 60, 55 57.8, 55 55 Z" fill="#b79438"/>
-                            </g>
-                        </svg>
-                        <span class="text-2xl font-bold theme-primary">Tradeginger</span>
-                    </a>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#" onclick="showPremiumListingPage(event)" class="text-gray-600 hover:text-theme-accent px-3 py-2 rounded-md text-sm font-medium">Premium</a>
-                        <a href="#" onclick="showListingPage(event, 'cars')" class="text-gray-600 hover:text-theme-accent px-3 py-2 rounded-md text-sm font-medium">Cars</a>
-                        <a href="#" onclick="showListingPage(event, 'mobiles')" class="text-gray-600 hover:text-theme-accent px-3 py-2 rounded-md text-sm font-medium">Mobiles</a>
-                        <a href="#" onclick="showListingPage(event, 'electronics')" class="text-gray-600 hover:text-theme-accent px-3 py-2 rounded-md text-sm font-medium">Electronics</a>
-                        <a href="#" onclick="showListingPage(event, 'property')" class="text-gray-600 hover:text-theme-accent px-3 py-2 rounded-md text-sm font-medium">Property</a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <a href="#" onclick="showLoginModal(event)" class="text-sm font-medium text-gray-700 hover:text-theme-accent mr-4">Login</a>
-                    <button onclick="showSellModal()" class="flex items-center bg-theme-accent text-white px-4 py-2 rounded-full shadow-lg hover:bg-theme-accent-dark transition duration-300">
-                        <i class="fas fa-plus-circle mr-2"></i>
-                        SELL
-                    </button>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Header Section (Logged-in state) -->
-    <header id="header-logged-in" class="bg-white shadow-md sticky top-0 z-50 hidden">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-8">
-                    <a href="#" onclick="showHomepage(event)" class="flex items-center space-x-2">
-                        <svg class="h-8 w-8" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                            <g>
-                                <path d="M50 10 C 27.9 10, 10 27.9, 10 50 C 10 72.1, 27.9 90, 50 90 C 72.1 90, 90 72.1, 90 50 C 90 27.9, 72.1 10, 50 10 Z M 50 15 C 69.3 15, 85 30.7, 85 50 C 85 69.3, 69.3 85, 50 85 C 30.7 85, 15 69.3, 15 50 C 15 30.7, 30.7 15, 50 15 Z" fill="#1a202c"/>
-                                <path d="M 40 30 L 60 30 L 60 50 L 50 50 L 50 70 L 40 70 Z" fill="#b79438"/>
-                                <path d="M 65 55 C 65 63.3, 58.3 70, 50 70 C 41.7 70, 35 63.3, 35 55 L 45 55 C 45 57.8, 47.2 60, 50 60 C 52.8 60, 55 57.8, 55 55 Z" fill="#b79438"/>
-                            </g>
-                        </svg>
-                        <span class="text-2xl font-bold theme-primary">Tradeginger</span>
-                    </a>
-                    <a href="#" onclick="showHomepage(event)" class="text-xl text-gray-500 hover:text-theme-accent" title="Home">
-                        <i class="fas fa-home"></i>
-                    </a>
-                    <a href="#" onclick="showPremiumListingPage(event)" class="text-gray-600 hover:text-theme-accent px-3 py-2 rounded-md text-sm font-medium">Premium</a>
-                    <a href="#" onclick="showDashboardPage(event)" class="text-gray-600 hover:text-theme-accent px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                    <div class="hidden md:flex items-center border-2 rounded-full p-1 w-96">
-                        <i class="fas fa-search text-gray-400 mx-3"></i>
-                        <input type="text" placeholder="Search for cars, mobiles..." class="w-full bg-transparent focus:outline-none text-sm">
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                   <button onclick="showPlaceholderPage(event)" class="relative bg-white p-1 rounded-full text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-comment-dots text-xl"></i>
-                        <span id="chat-notification-dot" class="hidden notification-dot"></span>
-                   </button>
-                    <div class="relative">
-                        <button onclick="toggleNotifications()" class="relative bg-white p-1 rounded-full text-gray-500 hover:text-gray-700">
-                            <i class="far fa-bell text-xl"></i>
-                            <span id="main-notification-dot" class="hidden notification-dot"></span>
-                        </button>
-                        <div id="notification-dropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 overflow-hidden">
-                            <div class="p-4 font-bold border-b">Notifications</div>
-                            <div class="divide-y">
-                                <a href="#" class="block p-4 text-sm hover:bg-gray-50">
-                                    <p class="font-semibold">Your ad is live!</p>
-                                    <p class="text-gray-500">Your listing "Honda City 2021" is now visible to everyone.</p>
-                                </a>
-                                <a href="#" onclick="showMyAdsPage(event)" class="block p-4 text-sm hover:bg-gray-50">
-                                    <p class="font-semibold">New Message</p>
-                                    <p class="text-gray-500">You have a new message regarding your ad "iPhone 14".</p>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="relative profile-button">
-                        <button class="flex items-center space-x-2">
-                            <img id="header-profile-pic" class="h-8 w-8 rounded-full object-cover" src="https://placehold.co/40x40/E2E8F0/4A5568?text=U" alt="User profile">
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </button>
-                        <div class="profile-dropdown absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 overflow-hidden">
-                            <div class="p-4">
-                                <div class="flex items-center gap-3">
-                                    <img id="dropdown-profile-pic" class="h-12 w-12 rounded-full object-cover" src="https://placehold.co/48x48/0A2342/D4AF37?text=U" alt="User profile">
-                                    <div>
-                                        <p id="dropdown-username" class="font-semibold text-gray-800">Unknown</p>
-                                        <a href="#" onclick="showUserProfilePage(event)" class="text-sm text-theme-accent hover:underline">View and edit profile</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <nav class="border-t border-gray-100">
-                                <a href="#" onclick="showMyAdsPage(event)" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><i class="fas fa-ad w-5 text-center text-gray-500"></i> My ADS</a>
-                                <a href="#" onclick="showPlaceholderPage(event)" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><i class="fas fa-briefcase w-5 text-center text-gray-500"></i> Premium Business Listing</a>
-                                <a href="#" onclick="showPlaceholderPage(event)" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><i class="fas fa-shopping-cart w-5 text-center text-gray-500"></i> View Cart</a>
-                                <a href="#" onclick="showPlaceholderPage(event)" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><i class="fas fa-file-invoice-dollar w-5 text-center text-gray-500"></i> Your Business Listing</a>
-                            </nav>
-                            <div class="border-t border-gray-100">
-                                <a href="#" onclick="showHelpPage(event)" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><i class="fas fa-question-circle w-5 text-center text-gray-500"></i> Help</a>
-                                <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><i class="fas fa-sign-out-alt w-5 text-center text-gray-500"></i> Logout</a>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="showSellModal()" class="flex items-center bg-theme-accent text-white px-4 py-2 rounded-full shadow-lg hover:bg-theme-accent-dark transition duration-300"><i class="fas fa-plus-circle mr-2"></i>SELL</button>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- PAGE 1: Homepage -->
-    <div id="homepage">
-        <section class="hero-section text-white py-20">
-            <!-- Beer Cap Icons -->
-            <div class="absolute top-4 left-4 flex space-x-3 z-20">
-                <a href="#" onclick="showListingPage(event, 'cars')" class="beer-cap" style="transform: rotate(-15deg);"><i class="fas fa-car"></i></a>
-                <a href="#" onclick="showListingPage(event, 'mobiles')" class="beer-cap" style="transform: rotate(10deg);"><i class="fas fa-mobile-alt"></i></a>
-                <a href="#" onclick="showListingPage(event, 'property')" class="beer-cap" style="transform: rotate(8deg);"><i class="fas fa-building"></i></a>
-                <a href="#" onclick="showListingPage(event, 'furniture')" class="beer-cap" style="transform: rotate(-12deg);"><i class="fas fa-couch"></i></a>
-                <a href="#" onclick="showListingPage(event, 'bikes')" class="beer-cap" style="transform: rotate(15deg);"><i class="fas fa-motorcycle"></i></a>
-                <a href="#" onclick="showListingPage(event, 'pets')" class="beer-cap" style="transform: rotate(-5deg);"><i class="fas fa-dog"></i></a>
-            </div>
-           
-            <div class="container mx-auto px-4 text-center relative z-10">
-                <h1 class="text-4xl md:text-5xl font-extrabold mb-4">India's Marketplace</h1>
-                <p class="text-lg md:text-xl mb-8">Find the best deals near you</p>
-                <div class="max-w-4xl mx-auto bg-white rounded-full p-2 flex items-center shadow-2xl">
-                    <div class="flex-grow flex items-center border-r-2 border-gray-200">
-                        <i class="fas fa-map-marker-alt text-gray-400 mx-3"></i>
-                        <input id="location-search" type="text" placeholder="Enter Pin Code or City" class="w-full bg-transparent text-gray-700 focus:outline-none">
-                    </div>
-                    <div class="flex-grow flex items-center ml-2">
-                         <i class="fas fa-search text-gray-400 mx-3"></i>
-                        <input id="keyword-search" type="text" placeholder="Search for cars, mobiles, and more..." class="w-full bg-transparent text-gray-700 focus:outline-none">
-                    </div>
-                    <button onclick="searchFromHome(event)" class="bg-theme-accent text-white rounded-full px-6 py-3 font-semibold hover:bg-theme-accent-dark transition duration-300">
-                        Search
-                    </button>
-                </div>
-            </div>
-        </section>
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <section class="mb-12">
-                <h2 class="text-2xl font-bold mb-6 text-center">Browse by Category</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <!-- Marketplace Goods -->
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4 theme-primary">Marketplace</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <a href="#" onclick="showListingPage(event, 'mobiles')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-mobile-alt text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">Mobiles</span></a>
-                            <a href="#" onclick="showListingPage(event, 'laptops')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-laptop text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">Laptops</span></a>
-                            <a href="#" onclick="showListingPage(event, 'furniture')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-couch text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">Furniture</span></a>
-                            <a href="#" onclick="showListingPage(event, 'fashion')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-tshirt text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">Fashion</span></a>
-                            <a href="#" onclick="showListingPage(event, 'pets')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-dog text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">Pets</span></a>
-                        </div>
-                    </div>
-                     <!-- Vehicles -->
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4 theme-primary">Vehicles</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <a href="#" onclick="showListingPage(event, 'cars')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-car text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">Cars</span></a>
-                             <a href="#" onclick="showListingPage(event, 'bikes')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-motorcycle text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">Bikes</span></a>
-                            <a href="#" onclick="showListingPage(event, 'commercial_vehicles')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-truck text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">Commercial</span></a>
-                        </div>
-                    </div>
-                     <!-- Real Estate -->
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4 theme-primary">Real Estate</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <a href="#" onclick="showListingPage(event, 'property')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-building text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">For Sale</span></a>
-                            <a href="#" onclick="showListingPage(event, 'property')" class="p-4 bg-white rounded-lg shadow hover:shadow-xl transition-shadow duration-300"><i class="fas fa-sign text-3xl text-theme-accent mb-2"></i><span class="block font-semibold text-sm">For Rent</span></a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- PAGE 2: Product Listing Page -->
-    <div id="listingpage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex flex-col md:flex-row gap-8">
-                <aside id="filter-sidebar" class="w-full md:w-1/3">
-                    <!-- Dynamic Filters will be injected here by JavaScript -->
-                </aside>
-                <section class="w-full md:w-2/3">
-                    <div class="flex items-center gap-4 mb-4">
-                        <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-                        <h1 id="listing-page-title" class="text-2xl font-bold"></h1>
-                    </div>
-                    <div id="listings-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Dynamic Ads will be loaded here -->
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
-
-    <!-- PAGE 3: Help Center -->
-    <div id="helppage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white p-8 rounded-lg shadow-md max-w-4xl mx-auto">
-                <div class="prose max-w-none">
-                    <div class="flex items-center gap-4 mb-6">
-                        <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-                        <h1 class="text-3xl font-bold">Help Center & Legal Information</h1>
-                    </div>
-                    <p class="mb-8">Welcome to the Tradeginger Help Center. Here you can find our terms of use, privacy policies, and rules for posting on our platform.</p>
-                   
-                    <h2 class="text-2xl font-bold border-b pb-2 mb-4">1. Terms of Use</h2>
-                    <p class="text-sm text-gray-500 mb-4"><strong>Last Updated:</strong> [Date]</p>
-                    <h3 class="text-xl font-semibold mt-4">Introduction</h3>
-                    <p>Welcome to Tradeginger! These are the terms and conditions governing your access to and use of the website Tradeginger and its related sub-domains, sites, services, and tools. By using the Site, you hereby accept these terms and conditions and represent that you agree to comply with these terms and conditions. This User Agreement is deemed effective upon your use of the Site which signifies your acceptance of these terms.</p>
-                    <h3 class="text-xl font-semibold mt-4">Eligibility for Membership</h3>
-                    <p>Tradeginger wishes to ensure that its members are able to form legally binding contracts and that minors do not purchase unsuitable content. Therefore, membership of the Site is not available to persons under the age of 18 years. You represent that you are 18 years of age or over the age of 18 years before you become a member of the Site.</p>
-                   
-                    <h2 class="text-2xl font-bold border-b pb-2 mb-4 mt-8">2. Privacy Policy</h2>
-                    <p class="text-sm text-gray-500 mb-4"><strong>Last Updated:</strong> [Date]</p>
-                    <p>This Privacy Policy describes our policies on the collection, use, and disclosure of information about you in connection with your use of our services, including those offered through our websites, communications (e.g., emails, phone calls, and texts), and mobile applications.</p>
-                    <h3 class="text-xl font-semibold mt-4">Information We Collect</h3>
-                    <p>We may collect and store information about you when you use the Service. We use the information to fulfill your requests, provide the Service’s functionality, improve the Service’s quality, personalize your experience, track usage of the Service, provide feedback to third-party businesses that are listed on the Service, display relevant advertising, market the Service, provide customer support, message you, back up our systems, and comply with legal obligations.</p>
-                   
-                    <h2 class="text-2xl font-bold border-b pb-2 mb-4 mt-8">3. Prohibited Items Policy</h2>
-                    <p>Tradeginger users are responsible for ensuring their ads comply with all applicable laws. Our list of prohibited products and services below is not exhaustive and we reserve the right to update it at any time.</p>
-                    <h3 class="text-xl font-semibold mt-4">Examples of Prohibited Items:</h3>
-                    <ul class="list-disc list-inside space-y-1">
-                        <li>Adult/Pornographic Material</li>
-                        <li>Alcohol, Tobacco Products, Drugs</li>
-                        <li>Counterfeit and Replica Items</li>
-                        <li>Firearms, Ammunition, and Weapons</li>
-                        <li>Hazardous Materials</li>
-                        <li>Human Parts and Remains</li>
-                        <li>Illegal Items & Services</li>
-                        <li>Stolen Property</li>
-                    </ul>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- PAGE 4: Placeholder Page -->
-    <div id="placeholderpage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto text-center">
-                 <div class="flex items-center justify-center gap-4 mb-6">
-                    <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-                    <h1 class="text-3xl font-bold theme-primary">Coming Soon!</h1>
-                </div>
-                <p class="mt-4 text-lg text-gray-600">We are working hard on this feature and will be updating soon.</p>
-            </div>
-        </main>
-    </div>
-
-    <!-- PAGE 5: Coming Soon Page -->
-    <div id="comingsoonpage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto text-center">
-                 <div class="flex items-center justify-center gap-4 mb-6">
-                    <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-                    <h1 class="text-3xl font-bold text-red-600">We would be Live soon</h1>
-                </div>
-            </div>
-        </main>
-    </div>
-   
-    <!-- PAGE 6: Product Detail Page -->
-    <div id="productdetailpage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-             <div class="flex items-center gap-4 mb-4">
-                <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-                <h1 class="text-2xl font-bold">Product Details</h1>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="flex flex-col md:flex-row gap-8">
-                    <!-- Image Gallery -->
-                    <div class="w-full md:w-2/3">
-                        <img id="main-product-image" src="https://placehold.co/800x600/CBD5E0/4A5568?text=Honda+City" alt="Main Product Image" class="w-full h-auto rounded-lg shadow-lg">
-                        <div class="flex space-x-2 mt-4">
-                            <img src="https://placehold.co/100x75/CBD5E0/4A5568?text=Side" alt="Thumbnail" class="w-24 h-auto rounded-md cursor-pointer border-2 border-theme-accent">
-                            <img src="https://placehold.co/100x75/CBD5E0/4A5568?text=Interior" alt="Thumbnail" class="w-24 h-auto rounded-md cursor-pointer">
-                            <img src="https://placehold.co/100x75/CBD5E0/4A5568?text=Back" alt="Thumbnail" class="w-24 h-auto rounded-md cursor-pointer">
-                        </div>
-                    </div>
-                    <!-- Ad Details -->
-                    <div class="w-full md:w-1/3">
-                        <div class="border-b pb-4 mb-4">
-                            <h2 id="product-detail-price" class="text-3xl font-bold mb-2"></h2>
-                            <p  id="product-detail-title" class="text-lg text-gray-600"></p>
-                            <div class="flex justify-between text-sm text-gray-500 mt-2">
-                                <span id="product-detail-location"></span>
-                                <span id="product-detail-date"></span>
-                            </div>
-                        </div>
-                        <div class="border-b pb-4 mb-4">
-                             <h3 class="text-xl font-semibold mb-2">Seller Details</h3>
-                             <div class="flex items-center gap-4">
-                                <img id="product-detail-seller-pic" class="h-16 w-16 rounded-full object-cover" src="" alt="Seller profile">
-                                <div>
-                                    <p id="product-detail-seller-name" class="font-bold text-lg"></p>
-                                    <p id="product-detail-seller-since" class="text-sm text-gray-500"></p>
-                                </div>
-                             </div>
-                             <button id="chat-with-seller-btn" class="w-full mt-4 bg-theme-primary text-white p-3 rounded-md font-semibold hover:bg-theme-primary-dark">
-                                 <i class="fas fa-comments mr-2"></i>Chat with Seller
-                             </button>
-                        </div>
-                         <button class="w-full border-2 border-gray-300 p-3 rounded-md flex items-center justify-center gap-2 hover:bg-gray-100">
-                            <i class="far fa-heart text-red-500"></i>
-                            <span class="font-semibold">Add to Favorites</span>
-                         </button>
-                    </div>
-                </div>
-                <div id="product-detail-attributes" class="mt-8 border-t pt-6">
-                    <h3 class="text-xl font-semibold mb-4">Details</h3>
-                    <!-- Attributes will be injected here -->
-                </div>
-                 <div class="mt-8 border-t pt-6">
-                    <h3 class="text-xl font-semibold mb-4">Description</h3>
-                    <p id="product-detail-description" class="text-gray-700 leading-relaxed"></p>
-                </div>
-                <div class="mt-8 border-t pt-6">
-                    <h3 class="text-xl font-semibold mb-4">Similar Ads</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <!-- Similar Ad 1 -->
-                        <a href="#" class="block bg-white rounded-lg border border-gray-200 overflow-hidden product-card transition-all duration-300">
-                            <img src="https://placehold.co/400x300/E2E8F0/4A5568?text=Hyundai+Verna" alt="Product" class="w-full h-40 object-cover">
-                            <div class="p-3">
-                                <h3 class="font-bold text-md mb-1">₹ 9,20,000</h3>
-                                <p class="text-gray-600 text-xs">Hyundai Verna 2022</p>
-                            </div>
-                        </a>
-                        <!-- Similar Ad 2 -->
-                        <a href="#" class="block bg-white rounded-lg border border-gray-200 overflow-hidden product-card transition-all duration-300">
-                            <img src="https://placehold.co/400x300/E2E8F0/4A5568?text=Maruti+Ciaz" alt="Product" class="w-full h-40 object-cover">
-                            <div class="p-3">
-                                <h3 class="font-bold text-md mb-1">₹ 8,90,000</h3>
-                                <p class="text-gray-600 text-xs">Maruti Suzuki Ciaz 2021</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="mt-8 border-t pt-6">
-                    <h3 class="text-xl font-semibold mb-4">Sponsored Links</h3>
-                    <div class="p-4 border rounded-lg bg-gray-50 text-center">
-                        <p class="text-gray-500">Advertisement</p>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- PAGE 7: My Ads Page -->
-    <div id="myadspage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex items-center gap-4 mb-6">
-                <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-                <h1 class="text-3xl font-bold">My Ads</h1>
-            </div>
-            <div id="my-ads-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Ads will be dynamically inserted here -->
-            </div>
-        </main>
-    </div>
-
-    <!-- PAGE 8: User Profile Page -->
-    <div id="userprofilepage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex flex-col md:flex-row gap-8">
-                <div class="w-full md:w-1/4">
-                    <div class="bg-white p-6 rounded-lg shadow-md text-center">
-                        <img id="profile-page-pic" class="h-24 w-24 rounded-full object-cover mx-auto mb-4" src="https://placehold.co/96x96/0A2342/D4AF37?text=M" alt="User profile">
-                        <h2 id="profile-page-username" class="text-2xl font-bold">Manas</h2>
-                        <p id="profile-page-member-since" class="text-sm text-gray-500">Member since Sep 2014</p>
-                        <div class="text-left text-sm mt-4">
-                            <p class="font-semibold mb-2">User verified with:</p>
-                            <div class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check-circle text-green-500"></i>
-                                <span>Phone</span>
-                            </div>
-                             <div class="flex items-center gap-2 text-gray-600">
-                                <i class="fas fa-check-circle text-green-500"></i>
-                                <span>Email</span>
-                            </div>
-                        </div>
-                        <button onclick="showEditProfilePage(event)" class="w-full mt-6 bg-theme-primary text-white p-3 rounded-md font-semibold hover:bg-theme-primary-dark">Edit Profile</button>
-                    </div>
-                </div>
-                <div class="w-full md:w-3/4">
-                     <div class="bg-white p-8 rounded-lg shadow-md text-center">
-                        <img src="https://placehold.co/300x200/F0F9FF/1a202c?text=Sell+Something" class="mx-auto mb-4">
-                        <h3 class="text-2xl font-bold">You haven't listed anything yet</h3>
-                        <p class="text-gray-500 mb-6">Let go of what you don't use anymore</p>
-                        <button onclick="showSellModal()" class="bg-theme-accent text-white px-6 py-3 rounded-full font-semibold hover:bg-theme-accent-dark">Start selling</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-   
-    <!-- PAGE 9: Edit Profile Page -->
-    <div id="editprofilepage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
-                <div class="flex items-center gap-4 mb-6 border-b pb-4">
-                    <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-                    <h1 class="text-2xl font-bold">Edit Profile</h1>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-4">Profile picture</h3>
-                        <div class="flex items-center gap-4">
-                             <img id="profile-pic-preview" class="h-24 w-24 rounded-full object-cover" src="https://placehold.co/96x96/0A2342/D4AF37?text=M" alt="User profile">
-                             <input type="file" id="profile-pic-upload" class="hidden" accept="image/*" onchange="handleProfilePictureChange(event)">
-                             <button onclick="document.getElementById('profile-pic-upload').click()" class="border border-gray-300 px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-50">Change Picture</button>
-                        </div>
-                        <div class="mt-8">
-                            <h3 class="text-lg font-semibold mb-4">Basic information</h3>
-                            <div class="space-y-4">
-                                <input id="edit-profile-name-input" type="text" value="Manas" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                                <textarea placeholder="About me (optional)" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent h-24"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="space-y-8">
-                        <div>
-                            <h3 class="text-lg font-semibold mb-2">Contact information</h3>
-                             <div class="space-y-4">
-                                <input type="email" value="user@example.com" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                                <input type="tel" value="+919876543210" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                            </div>
-                        </div>
-                         <div>
-                            <h3 class="text-lg font-semibold mb-2">Additional information</h3>
-                             <div class="flex items-center justify-between p-4 border rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <i class="fab fa-google text-red-500 text-2xl"></i>
-                                    <div>
-                                        <p class="font-semibold">Google</p>
-                                        <p class="text-xs text-gray-500">Link your Google account to seamlessly use your contact list.</p>
-                                    </div>
-                                </div>
-                                <button class="border-2 border-red-500 text-red-500 px-4 py-1 rounded-full text-sm font-semibold hover:bg-red-50">Unlink</button>
-                             </div>
-                        </div>
-                    </div>
-                </div>
-                 <div class="flex justify-end gap-4 border-t pt-6 mt-8">
-                    <button onclick="showUserProfilePage(event)" class="text-gray-600 font-semibold hover:text-theme-primary">Discard</button>
-                    <button onclick="handleProfileUpdate(event)" class="bg-theme-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-theme-primary-dark">Save changes</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- PAGE 10: Premium Listing Page -->
-    <div id="premiumlistingpage" class="hidden">
-        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex items-center gap-4 mb-6">
-                <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-                <h1 class="text-3xl font-bold">Premium Listings</h1>
-            </div>
-            <div class="space-y-12">
-                <!-- Featured Vehicles -->
-                <section>
-                    <h2 class="text-2xl font-bold mb-4">Featured Vehicles</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                         <a href="#" onclick="showProductDetailPage(event)" class="block bg-white rounded-lg border-2 border-theme-accent overflow-hidden product-card transition-all duration-300 relative">
-                            <span class="premium-tag">Premium</span>
-                            <img src="https://placehold.co/400x300/FEF3C7/4A5568?text=Jeep+Compass" alt="Product" class="w-full h-48 object-cover">
-                            <div class="p-4">
-                                <h3 class="font-bold text-lg mb-2">₹ 18,50,000</h3>
-                                <p class="text-gray-600 text-sm">Jeep Compass 2022, Low KMs</p>
-                            </div>
-                        </a>
-                    </div>
-                </section>
-                 <!-- Premium Properties -->
-                <section>
-                    <h2 class="text-xl font-bold mb-4">Premium Properties</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                         <a href="#" onclick="showProductDetailPage(event)" class="block bg-white rounded-lg border-2 border-theme-accent overflow-hidden product-card transition-all duration-300 relative">
-                            <span class="premium-tag">Premium</span>
-                            <img src="https://placehold.co/400x300/FEF3C7/4A5568?text=Luxury+Villa" alt="Product" class="w-full h-48 object-cover">
-                            <div class="p-4">
-                                <h3 class="font-bold text-lg mb-2">₹ 2,50,00,000</h3>
-                                <p class="text-gray-600 text-sm">4 BHK Luxury Villa in South Delhi</p>
-                            </div>
-                        </a>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
-
-    <!-- PAGE 11: User Dashboard -->
-    <div id="dashboardpage" class="hidden">
-      <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex items-center gap-4 mb-6">
-              <a href="#" onclick="goBack(event)" class="text-xl text-gray-500 hover:theme-primary" title="Back"><i class="fas fa-arrow-left"></i></a>
-              <h1 class="text-3xl font-bold">Premium Dashboard</h1>
-        </div>
-        <div class="dashboard-grid">
-          <div class="card"><strong>Balance:</strong> ₹12,300</div>
-          <div class="card"><strong>Last Login:</strong> 19 Jul 2025</div>
-          <div class="card"><strong>Status:</strong> Premium Member</div>
-        </div>
-      </main>
-    </div>
-
-    <!-- Universal Footer -->
-    <footer class="bg-gray-800 text-white mt-12">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div><h3 class="font-bold mb-4">Popular Categories</h3><ul><li class="mb-2"><a href="#" onclick="showListingPage(event, 'cars')" class="hover:text-theme-accent">Cars</a></li><li class="mb-2"><a href="#" onclick="showListingPage(event, 'mobiles')" class="hover:text-theme-accent">Mobiles</a></li></ul></div>
-                <div><h3 class="font-bold mb-4">About Us</h3><ul><li class="mb-2"><a href="#" onclick="showComingSoonPage(event)" class="hover:text-theme-accent">About Tradeginger</a></li><li class="mb-2"><a href="#" onclick="showComingSoonPage(event)" class="hover:text-theme-accent">Careers</a></li></ul></div>
-                <div><h3 class="font-bold mb-4">Tradeginger</h3><ul><li class="mb-2"><a href="#" onclick="showHelpPage(event)" class="hover:text-theme-accent">Help</a></li><li class="mb-2"><a href="#" onclick="showHelpPage(event)" class="hover:text-theme-accent">Legal & Privacy</a></li></ul></div>
-                <div><h3 class="font-bold mb-4">Follow Us</h3><div class="flex space-x-4"><a href="#" onclick="showComingSoonPage(event)" class="text-2xl hover:text-theme-accent"><i class="fab fa-facebook-f"></i></a><a href="#" onclick="showComingSoonPage(event)" class="text-2xl hover:text-theme-accent"><i class="fab fa-twitter"></i></a><a href="#" onclick="showComingSoonPage(event)" class="text-2xl hover:text-theme-accent"><i class="fab fa-instagram"></i></a></div></div>
-            </div>
-            <div class="text-center text-gray-400 mt-8 pt-8 border-t border-gray-700">&copy; 2025 Tradeginger. All rights reserved.</div>
-        </div>
-    </footer>
-
-    <!-- Universal Sell Item Modal -->
-    <div id="sellModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 h-full w-full z-50 flex items-center justify-center">
-        <div class="relative mx-auto border w-full max-w-3xl shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center p-4 border-b"><p class="text-2xl font-bold">Post Your Ad</p><div class="cursor-pointer z-50" onclick="hideSellModal()"><i class="fas fa-times text-xl"></i></div></div>
-            <div class="p-6 modal-content" style="max-height: 85vh; overflow-y: auto;">
-                <form id="adForm" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Category*</label>
-                        <select id="category-select" onchange="updateAttributeFields()" class="mt-1 block w-full input-style">
-                            <option value="">Select a Category</option>
-                        </select>
-                    </div>
-                    <div id="category-attributes" class="space-y-4 border-t pt-4 mt-4"></div>
-                    <div class="border-t pt-6 mt-6 space-y-6">
-                        <div>
-                            <label class="label-style">Ad Title*</label>
-                            <input type="text" id="ad-title" class="mt-1 block w-full input-style" required>
-                        </div>
-                        <div>
-                            <div class="flex justify-between items-center">
-                                <label class="label-style">Description* (Min 50 words)</label>
-                                <button type="button" onclick="generateDescription()" class="text-sm text-theme-accent font-semibold">✨ Generate Description</button>
-                            </div>
-                            <textarea rows="4" id="ad-description" placeholder="Include condition, features, and reason for selling" class="mt-1 block w-full input-style" required></textarea>
-                        </div>
-                        <div>
-                            <label class="label-style">Set a Price (₹)*</label>
-                            <input type="number" id="ad-price" placeholder="e.g., 15000" class="mt-1 block w-full input-style" required>
-                        </div>
-                        <div>
-                            <label class="label-style">Upload Photos</label>
-                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                                <div class="space-y-1 text-center">
-                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
-                                    <div class="flex text-sm text-gray-600">
-                                        <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-theme-accent hover\:text-theme-accent">
-                                            <span>Upload a file</span>
-                                            <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple>
-                                        </label>
-                                        <p class="pl-1">or drag and drop</p>
-                                    </div>
-                                    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input id="terms-checkbox" type="checkbox" onchange="togglePostButton()" class="h-4 w-4 text-theme-accent rounded focus:ring-theme-accent">
-                            <label for="terms-checkbox" class="text-xs text-gray-600">I have read all <a href="#" onclick="showTncModal(event)" class="underline text-theme-primary">T&C</a> AND I accepted the T&C*</label>
-                        </div>
-                    </div>
-                    <div class="pt-6 border-t">
-                        <button id="post-ad-button" type="submit" class="w-full bg-theme-accent text-white py-3 px-4 rounded-md font-semibold text-lg opacity-50 cursor-not-allowed" disabled>Post Now</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-   
-    <!-- T&C Modal -->
-    <div id="tncModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 h-full w-full z-50 flex items-center justify-center">
-        <div class="relative mx-auto border w-full max-w-2xl shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center p-4 border-b">
-                <p class="text-2xl font-bold">Terms of Use</p>
-                <div class="cursor-pointer z-50" onclick="hideTncModal()">
-                    <i class="fas fa-times text-xl"></i>
-                </div>
-            </div>
-            <div class="p-6 modal-content prose prose-sm max-w-none" style="max-height: 70vh; overflow-y: auto;">
-                 <p class="text-sm text-gray-500 mb-4"><strong>Last Updated:</strong> [Date]</p>
-                 <h3 class="text-xl font-semibold mt-4">Introduction</h3>
-                 <p>Welcome to Tradeginger! These are the terms and conditions governing your access to and use of the website Tradeginger and its related sub-domains, sites, services, and tools. By using the Site, you hereby accept these terms and conditions and represent that you agree to comply with these terms and conditions. This User Agreement is deemed effective upon your use of the Site which signifies your acceptance of these terms.</p>
-                 <h3 class="text-xl font-semibold mt-4">Eligibility for Membership</h3>
-                 <p>Tradeginger wishes to ensure that its members are able to form legally binding contracts and that minors do not purchase unsuitable content. Therefore, membership of the Site is not available to persons under the age of 18 years. You represent that you are 18 years of age or over the age of 18 years before you become a member of the Site.</p>
-                 <h2 class="text-2xl font-bold border-b pb-2 mb-4 mt-8">2. Privacy Policy</h2>
-                 <p class="text-sm text-gray-500 mb-4"><strong>Last Updated:</strong> [Date]</p>
-                 <p>This Privacy Policy describes our policies on the collection, use, and disclosure of information about you in connection with your use of our services, including those offered through our websites, communications (e.g., emails, phone calls, and texts), and mobile applications.</p>
-                 <h3 class="text-xl font-semibold mt-4">Information We Collect</h3>
-                 <p>We may collect and store information about you when you use the Service. We use the information to fulfill your requests, provide the Service’s functionality, improve the Service’s quality, personalize your experience, track usage of the Service, provide feedback to third-party businesses that are listed on the Service, display relevant advertising, market the Service, provide customer support, message you, back up our systems, and comply with legal obligations.</p>
-                 <h2 class="text-2xl font-bold border-b pb-2 mb-4 mt-8">3. Prohibited Items Policy</h2>
-                 <p>Tradeginger users are responsible for ensuring their ads comply with all applicable laws. Our list of prohibited products and services below is not exhaustive and we reserve the right to update it at any time.</p>
-                 <h3 class="text-xl font-semibold mt-4">Examples of Prohibited Items:</h3>
-                 <ul class="list-disc list-inside space-y-1">
-                     <li>Adult/Pornographic Material</li>
-                     <li>Alcohol, Tobacco Products, Drugs</li>
-                     <li>Counterfeit and Replica Items</li>
-                     <li>Firearms, Ammunition, and Weapons</li>
-                     <li>Hazardous Materials</li>
-                     <li>Human Parts and Remains</li>
-                     <li>Illegal Items & Services</li>
-                     <li>Stolen Property</li>
-                 </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div id="loginModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 h-full w-full z-50 flex items-center justify-center p-4">
-        <div class="relative w-full max-w-4xl mx-auto rounded-lg overflow-hidden flex flex-col md:flex-row" style="max-height: 90vh;">
-            <!-- Left Side -->
-            <div class="w-full md:w-1/3 bg-theme-primary text-white p-8 space-y-8 hidden md:flex flex-col justify-center">
-                <div class="flex items-center gap-4">
-                    <i class="fas fa-truck-loading text-2xl text-theme-accent"></i>
-                    <div>
-                        <h3 class="font-bold">Manage your orders</h3>
-                        <p class="text-sm text-gray-300">Track your orders, delivery and returns</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <i class="fas fa-comments-dollar text-2xl text-theme-accent"></i>
-                    <div>
-                        <h3 class="font-bold">Transact with buyers and sellers</h3>
-                        <p class="text-sm text-gray-300">Check and respond to chats, replies, offers and more</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <i class="fas fa-bell text-2xl text-theme-accent"></i>
-                    <div>
-                        <h3 class="font-bold">Personalized notifications and alerts</h3>
-                        <p class="text-sm text-gray-300">Get matching alerts for the products/services you are looking for</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Right Side -->
-            <div class="w-full md:w-2/3 bg-white p-8 flex flex-col justify-center relative overflow-y-auto">
-                <button onclick="hideLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
-                <div id="login-form" class="w-full max-w-sm mx-auto">
-                    <div class="flex border-b mb-4">
-                        <button id="login-tab" class="flex-1 py-2 font-semibold border-b-2 border-theme-accent" onclick="switchAuthForm('login')">Login</button>
-                        <button id="register-tab" class="flex-1 py-2 text-gray-500" onclick="switchAuthForm('register')">Register</button>
-                    </div>
-                    <h2 class="text-2xl font-bold text-center mb-2">Login to Tradeginger</h2>
-                    <p class="text-center text-gray-500 mb-6">Please provide your Email and Password</p>
-                    <input id="login-email" type="email" placeholder="Enter Email" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                    <input id="login-password" type="password" placeholder="Enter Password" class="w-full border-2 border-gray-300 p-3 rounded-md mt-4 focus:outline-none focus:border-theme-accent">
-                    <button onclick="handleLogin(event)" class="w-full bg-theme-primary text-white p-3 rounded-md mt-4 font-semibold hover:bg-theme-primary-dark">Continue</button>
-                    <div class="my-6 flex items-center">
-                        <div class="flex-grow border-t border-gray-300"></div>
-                        <span class="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
-                        <div class="flex-grow border-t border-gray-300"></div>
-                    </div>
-                    <button onclick="loginWithGoogle(event)" class="w-full border-2 border-gray-300 p-3 rounded-md flex items-center justify-center gap-2 hover:bg-gray-50">
-                        <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5">
-                        <span class="font-semibold">Login with Google</span>
-                    </button>
-                     <p class="text-center mt-4 text-sm">Don't have an account? <a href="#" onclick="switchAuthForm('register')" class="font-semibold text-theme-accent">Register</a></p>
-                </div>
-                <div id="register-form" class="w-full max-w-sm mx-auto hidden">
-                     <div class="flex border-b mb-4">
-                        <button id="login-tab-reg" class="flex-1 py-2 text-gray-500" onclick="switchAuthForm('login')">Login</button>
-                        <button id="register-tab-reg" class="flex-1 py-2 font-semibold border-b-2 border-theme-accent" onclick="switchAuthForm('register')">Register</button>
-                    </div>
-                    <h2 class="text-2xl font-bold text-center mb-6">Register on Tradeginger</h2>
-                    <div class="space-y-4">
-                        <input id="register-first-name" type="text" placeholder="First Name" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                        <input id="register-last-name" type="text" placeholder="Last Name" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                        <input id="register-email" type="email" placeholder="Email" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                        <input id="register-mobile" type="tel" placeholder="10-digit Mobile Number" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                        <input id="register-password" type="password" placeholder="Password" class="w-full border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:border-theme-accent">
-                        <button onclick="handleRegister(event)" class="w-full bg-theme-primary text-white p-3 rounded-md mt-4 font-semibold hover:bg-theme-primary-dark">Register</button>
-                    </div>
-                    <p class="text-center mt-4 text-sm">Already have an account? <a href="#" onclick="switchAuthForm('login')" class="font-semibold text-theme-accent">Login</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chat Window -->
-    <div id="chat-window" class="hidden fixed bottom-0 right-4 w-80 bg-white rounded-t-lg shadow-2xl z-50">
-        <div class="flex justify-between items-center bg-theme-primary text-white p-2 rounded-t-lg">
-            <div>
-                <p id="chat-seller-name" class="font-bold text-sm"></p>
-                <p id="chat-ad-id" class="text-xs"></p>
-            </div>
-            <div>
-                <button id="mute-btn" onclick="toggleMute()" class="mr-2 hover:text-theme-accent"><i class="fas fa-volume-up"></i></button>
-                <button onclick="closeChatWindow()" class="hover:text-red-400"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
-        <div id="chat-messages" class="h-64 p-4 overflow-y-auto space-y-4">
-            <!-- Messages will be injected here -->
-        </div>
-        <div class="p-2 border-t">
-            <div class="flex items-center mb-2">
-                <button onclick="getAIChatAssistance('suggest_questions')" class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full hover:bg-gray-300">✨ Suggest Questions</button>
-                <button onclick="getAIChatAssistance('draft_reply')" class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full hover:bg-gray-300 ml-2">✨ Draft Reply</button>
-                <button onclick="getAIChatAssistance('negotiation_tips')" class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full hover:bg-gray-300 ml-2">✨ Negotiate</button>
-            </div>
-            <form id="chat-form" class="flex items-center">
-                <input id="chat-input" type="text" placeholder="Type a message..." class="w-full border rounded-full py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-theme-accent">
-                <button type="submit" class="ml-2 bg-theme-accent text-white rounded-full h-8 w-8 flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
-            </form>
-        </div>
-    </div>
-
-     <!-- Ad Submission Success Modal -->
-    <div id="adSuccessModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 h-full w-full z-50 flex items-center justify-center">
-        <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-md bg-white text-center">
-            <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
-            <h3 class="text-2xl font-bold mb-2">Ad Submitted!</h3>
-            <p class="text-gray-600 mb-6">Your ad is under processing and will be live soon.</p>
-            <div class="space-y-4">
-                <button onclick="showPremiumListingPage(event); hideAdSuccessModal();" class="w-full bg-theme-accent text-white p-3 rounded-md font-semibold hover:bg-theme-accent-dark">For Paid Listing Click here</button>
-                <button onclick="hideAdSuccessModal()" class="w-full bg-gray-200 text-gray-700 p-2 rounded-md font-semibold hover:bg-gray-300">Close</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Resume Parsing Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
     <script>
-        // --- Supabase Connection ---
-        const SUPABASE_URL = 'https://ynyqwmbeglqwtvwqpaeg.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlueXF3bWJlZ2xxd3R2d3FwYWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5MzAxODcsImV4cCI6MjA3MTUwNjE4N30.IsLuwykC4Qtl4gXsFrygN5Ko1o4VZ4oLS6EDd8QGWoI';
-       
-        let supabase = null;
-        if(window.supabase) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } else {
-            console.error("Supabase client library not loaded.");
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stone: { 50: '#fafaf9', 100: '#f5f5f4', 200: '#e7e5e4', 300: '#d6d3d1', 400: '#a8a29e', 500: '#78716c', 600: '#57534e', 700: '#44403c', 800: '#292524', 900: '#1c1917' },
+                        gold: { 500: '#b45309', 600: '#92400e', 700: '#78350f' }
+                    },
+                    fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] },
+                    boxShadow: { 'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)', 'card': '0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02)' },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+        
+        // PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <style>
+        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); border: 1px solid #e7e5e4; backdrop-filter: blur(8px); }
+        .nav-item { transition: all 0.2s ease; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background-color: #e7e5e4; border-left-color: #1c1917; color: #000; font-weight: 500; }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .circle-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .circle-card:hover { transform: translateY(-4px); border-color: #a8a29e; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        .circle-card.selected { border-color: #1c1917; background-color: #fafaf9; ring: 1px solid #1c1917; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #44403c; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .action-btn { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 500; color: #57534e; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; }
+        .action-btn:hover { background-color: #f5f5f4; color: #1c1917; }
+        .reaction-trigger:hover .reaction-dock { display: flex; animation: dockUp 0.2s ease-out forwards; }
+        .reaction-dock { display: none; position: absolute; bottom: 100%; left: 0; margin-bottom: 8px; background: white; padding: 4px 8px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e7e5e4; gap: 4px; z-index: 50; }
+        @keyframes dockUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .reaction-emoji { font-size: 1.25rem; transition: transform 0.1s; cursor: pointer; padding: 2px; }
+        .reaction-emoji:hover { transform: scale(1.3); }
+        
+        /* Timeline Styles */
+        .timeline-item { position: relative; padding-left: 24px; border-left: 2px solid #e7e5e4; padding-bottom: 24px; }
+        .timeline-item:last-child { border-left: none; }
+        .timeline-dot { position: absolute; left: -5px; top: 0; width: 8px; height: 8px; background-color: #a8a29e; border-radius: 50%; }
+        .timeline-item:hover .timeline-dot { background-color: #1c1917; transform: scale(1.2); transition: all 0.2s; }
+
+        /* Trust Score Animation */
+        @keyframes scoreFlash { 0% { color: #1c1917; } 50% { color: #16a34a; transform: scale(1.1); } 100% { color: #1c1917; transform: scale(1); } }
+        .score-update { animation: scoreFlash 0.5s ease-in-out; }
+
+        /* Autocomplete */
+        .autocomplete-items { position: absolute; border: 1px solid #d6d3d1; border-top: none; z-index: 99; top: 100%; left: 0; right: 0; border-radius: 0 0 4px 4px; background-color: white; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .autocomplete-item { padding: 10px; cursor: pointer; background-color: #fff; border-bottom: 1px solid #f5f5f4; font-size: 0.875rem; }
+        .autocomplete-item:hover { background-color: #f5f5f4; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden selection:bg-stone-200 selection:text-black">
+
+    <!-- APP STATE & LOGIC -->
+    <script>
+        const appState = {
+            user: { 
+                name: "", role: "", company: "", email: "", bio: "", trustScore: 750, location: "",
+                avatarUrl: "",
+                experience: [], 
+                education: []   
+            },
+            selectedCircle: null,
+            network: [],
+            // Defining Circles with specific colors for the profile frame
+            circles: [
+                { id: 'founder', name: "Founders", desc: "0-1 & Scale-up", icon: "🚀", color: "border-amber-500", text: "text-amber-800" },
+                { id: 'cxo', name: "CXO Suite", desc: "C-Level Execs", icon: "💼", color: "border-slate-800", text: "text-slate-900" },
+                { id: 'professional', name: "Professionals", desc: "Career Growth", icon: "👔", color: "border-blue-600", text: "text-blue-700" },
+                { id: 'tech', name: "Tech Leaders", desc: "Engineering & AI", icon: "⚡", color: "border-cyan-600", text: "text-cyan-700" },
+                { id: 'product', name: "Product", desc: "Strategy & UX", icon: "👁️", color: "border-purple-600", text: "text-purple-700" },
+                { id: 'capital', name: "Investors", desc: "VC & PE", icon: "📈", color: "border-emerald-600", text: "text-emerald-700" },
+                { id: 'student', name: "Students", desc: "Future Leaders", icon: "🎓", color: "border-yellow-500", text: "text-yellow-600" },
+                { id: 'aspirant', name: "Job Seekers", desc: "Open to Work", icon: "🔍", color: "border-pink-500", text: "text-pink-600" },
+                { id: 'retired', name: "Veterans", desc: "Retired Pros", icon: "🎖️", color: "border-stone-500", text: "text-stone-600" }
+            ],
+            briefing: "Today in Founders' Table: Discussion heating up on 'Bootstrapping vs VC in 2025'. 12 Members shared hiring playbooks. 3 new M&A opportunities listed.",
+            newsInterests: "Business, Tech, Global Economy",
+            notifications: [
+                { id: 1, text: "Sarah Jenkins vouched for your recent post.", time: "2h ago", read: false },
+                { id: 2, text: "Marcus T. requested to connect.", time: "4h ago", read: false }
+            ],
+            conversations: [
+                { 
+                    id: 1, 
+                    user: "Elena R.", 
+                    role: "CFO at FintechX", 
+                    avatar: "ER", 
+                    lastMessage: "Do you have a moment to discuss the Q3 metrics?", 
+                    time: "10:30 AM",
+                    messages: [
+                        { sender: "Elena R.", text: "Hi Alex, saw your post about hiring." },
+                        { sender: "You", text: "Yes, we are looking for a new VP." },
+                        { sender: "Elena R.", text: "Do you have a moment to discuss the Q3 metrics?" }
+                    ]
+                }
+            ],
+            activeConversationId: 1,
+            connectionTarget: null // Used for the modal
+        };
+
+        const mockDatabase = [
+            { id: 101, name: "Sarah Jenkins", role: "VP Engineering", company: "Acme Corp", email: "sarah@acme.com", domain: "acme.com", circle: "tech" },
+            { id: 102, name: "David Lo", role: "Product Lead", company: "Acme Corp", email: "david@acme.com", domain: "acme.com", circle: "product" },
+            { id: 103, name: "Elena R.", role: "CFO", company: "FintechX", email: "elena@fintechx.com", domain: "fintechx.com", circle: "cxo" },
+            { id: 104, name: "Marcus T.", role: "Founder", company: "Stealth", email: "marcus@stealth.io", domain: "stealth.io", circle: "founder" },
+            { id: 105, name: "Dr. Aris", role: "Chief Scientist", company: "DeepMind", email: "aris@google.com", domain: "google.com", circle: "tech" }
+        ];
+
+        // Global Company Database (Simulated)
+        const globalCompanies = [
+            "Accenture", "Adobe", "Airbnb", "Alphabet (Google)", "Amazon", "American Express", "Apple", "AT&T",
+            "Bain & Company", "Bank of America", "Barclays", "Berkshire Hathaway", "BlackRock", "Blackstone", "Bloomberg", "Boeing", "Boston Consulting Group", "BP", "Bridgewater",
+            "Cisco", "Citigroup", "Coca-Cola", "Comcast", "Costco",
+            "Deloitte", "Disney", "Dropbox",
+            "Electronic Arts", "ExxonMobil", "EY",
+            "Facebook (Meta)", "FedEx", "Fidelity", "Ford",
+            "General Electric", "General Motors", "Goldman Sachs",
+            "Home Depot", "Honeywell", "HP", "HSBC",
+            "IBM", "Intel", "Intuit",
+            "Johnson & Johnson", "JPMorgan Chase",
+            "KPMG",
+            "LinkedIn", "Lockheed Martin",
+            "Mastercard", "McDonald's", "McKinsey & Company", "Microsoft", "Morgan Stanley",
+            "Netflix", "Nike", "NVIDIA",
+            "Oracle",
+            "Palantir", "PayPal", "PepsiCo", "Pfizer", "Procter & Gamble", "PwC",
+            "Qualcomm",
+            "Salesforce", "Samsung", "SAP", "Sequoia Capital", "Shell", "Shopify", "Siemens", "Sony", "SpaceX", "Spotify", "Starbucks", "Stripe",
+            "Target", "Tesla", "TikTok", "Toyota", "Twitter (X)",
+            "Uber", "UBS", "Unilever", "UnitedHealth Group", "UPS",
+            "Verizon", "Visa", "Volkswagen",
+            "Walmart", "Warner Bros. Discovery", "Wells Fargo",
+            "Y Combinator",
+            // Individual Statuses
+            "Student", "Job Seeker", "Freelancer", "Self-Employed", "Independent"
+        ];
+
+        const globalDesignations = [
+            "CEO", "CTO", "CFO", "COO", "CMO", "CPO", "CIO", "CHRO",
+            "President", "Vice President", "Director", "Head of Product", "Head of Engineering", "Head of Sales", "Head of Marketing",
+            "Product Manager", "Project Manager", "Program Manager",
+            "Software Engineer", "Senior Software Engineer", "Staff Engineer", "Principal Engineer",
+            "Data Scientist", "Data Analyst", "Business Analyst",
+            "UX Designer", "UI Designer", "Product Designer",
+            "Sales Manager", "Account Executive", "Business Development Manager",
+            "Marketing Manager", "Content Strategist", "Social Media Manager",
+            "HR Manager", "Recruiter", "Talent Acquisition Specialist",
+            "Consultant", "Strategy Consultant", "Investment Banker", "Private Equity Associate",
+            "Founder", "Co-Founder", "Owner", "Partner", "Managing Director", "Student", "Intern", "Apprentice"
+        ];
+
+        const apiKey = ""; 
+
+        async function callGemini(prompt, buttonId) {
+            const btn = buttonId ? document.getElementById(buttonId) : null;
+            const originalText = btn ? btn.innerHTML : "";
+            try {
+                if (btn) { btn.disabled = true; btn.innerHTML = `<span class="loader mr-2"></span> Thinking...`; }
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                if (!response.ok) throw new Error('API Error');
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text.trim();
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                if(buttonId) alert("AI Service temporarily unavailable.");
+                return null;
+            } finally {
+                if(btn) { btn.disabled = false; btn.innerHTML = originalText; }
+            }
+        }
+    </script>
+
+    <!-- VIEW 1: PRESTIGE LANDING -->
+    <div id="view-landing" class="absolute inset-0 z-50 bg-stone-900 flex items-center justify-center p-6 transition-transform duration-700 ease-in-out">
+        <div class="max-w-5xl w-full grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8 text-stone-100">
+                <div class="border-l-2 border-gold-600 pl-6">
+                    <h1 class="font-serif text-5xl md:text-6xl leading-tight mb-4">Signal.<br><span class="text-stone-500 italic">Not Noise.</span></h1>
+                    <p class="text-stone-400 text-lg font-light max-w-md leading-relaxed">
+                        The private infrastructure for serious professionals. No vanity metrics. Just vetted peers and high-value discourse.
+                    </p>
+                </div>
+                <div class="space-y-4">
+                    <div id="auth-forms" class="bg-white rounded-sm p-1 max-w-sm">
+                        <!-- Google Login -->
+                        <div class="p-4 pb-0">
+                            <button onclick="handleGoogleLogin(this)" class="w-full flex items-center justify-center gap-2 bg-white border border-stone-300 text-stone-700 py-2.5 text-sm font-medium rounded-sm hover:bg-stone-50 transition mb-4 shadow-sm">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                                Continue with Google
+                            </button>
+                            <div class="relative mb-4">
+                                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-stone-200"></div></div>
+                                <div class="relative flex justify-center text-[10px] uppercase tracking-wider text-stone-400"><span class="bg-white px-2">Or via OTP</span></div>
+                            </div>
+                        </div>
+
+                        <!-- OTP Tabs -->
+                        <div class="flex border-b border-stone-100 mx-4">
+                            <button onclick="toggleAuth('email')" id="tab-email" class="flex-1 py-2 text-xs font-bold text-stone-900 border-b-2 border-stone-900 uppercase tracking-wide">Gmail OTP</button>
+                            <button onclick="toggleAuth('wa')" id="tab-wa" class="flex-1 py-2 text-xs font-bold text-stone-400 border-b-2 border-transparent hover:text-stone-600 uppercase tracking-wide">WhatsApp</button>
+                        </div>
+                        <div class="p-4">
+                            <input type="text" id="auth-input" class="w-full border-b border-stone-300 py-2 text-stone-900 outline-none focus:border-stone-900 placeholder-stone-400 bg-transparent text-sm" placeholder="name@gmail.com">
+                            <button id="btn-auth-action" onclick="handleSignup()" class="w-full mt-4 bg-stone-900 text-white py-3 text-sm font-medium rounded-sm hover:bg-stone-800 transition">Send Gmail OTP</button>
+                        </div>
+                    </div>
+                    <p class="text-stone-600 text-xs">By applying, you agree to our <span class="underline">Chatham House Rule</span> policy.</p>
+                </div>
+            </div>
+            <div class="hidden md:block h-[500px] bg-stone-800 rounded-sm overflow-hidden relative opacity-80 border border-stone-700">
+                <!-- Abstract UI mock -->
+                <div class="absolute top-10 left-10 right-10 bottom-0 bg-stone-100 rounded-t-lg p-6 shadow-2xl">
+                    <div class="h-4 w-32 bg-stone-300 rounded mb-6"></div>
+                    <div class="space-y-4">
+                        <div class="h-24 bg-white border border-stone-200 rounded p-4 flex gap-4">
+                            <div class="w-12 h-12 rounded-full bg-stone-200"></div>
+                            <div class="flex-1 space-y-2">
+                                <div class="h-3 w-3/4 bg-stone-200 rounded"></div>
+                                <div class="h-3 w-1/2 bg-stone-200 rounded"></div>
+                            </div>
+                        </div>
+                        <div class="h-24 bg-white border border-stone-200 rounded p-4 flex gap-4 opacity-50">
+                            <div class="w-12 h-12 rounded-full bg-stone-200"></div>
+                            <div class="flex-1 space-y-2">
+                                <div class="h-3 w-3/4 bg-stone-200 rounded"></div>
+                                <div class="h-3 w-1/2 bg-stone-200 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 2: EXECUTIVE PROFILE BUILDER -->
+    <div id="view-profile" class="absolute inset-0 z-40 bg-stone-50 flex items-center justify-center p-6 hidden overflow-y-auto">
+        <div class="max-w-2xl w-full bg-white p-10 shadow-xl border border-stone-200">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="font-serif text-3xl text-stone-900">Executive Dossier</h2>
+                    <p class="text-stone-500 text-sm mt-1">This is how you will be presented to the circle.</p>
+                </div>
+                <div class="text-xs font-mono text-stone-400">STEP 1 OF 2</div>
+            </div>
+
+            <!-- Pre-fill from Resume -->
+            <div class="mb-8 p-4 bg-stone-50 border border-dashed border-stone-300 rounded flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-bold text-stone-700">Quick Start</p>
+                    <p class="text-xs text-stone-500">Upload your resume to auto-fill details.</p>
+                </div>
+                <label class="cursor-pointer bg-white border border-stone-300 text-stone-700 text-xs py-2 px-3 rounded hover:bg-stone-50 transition">
+                    <span>Upload PDF / DOCX</span>
+                    <input type="file" class="hidden" accept=".pdf,.docx,.txt" onchange="handleResumeUpload(this, true)">
+                </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Avatar Col -->
+                <div class="col-span-1 flex flex-col items-center text-center">
+                    <div class="relative group">
+                        <div id="p-avatar-preview" onclick="document.getElementById('p-avatar-upload').click()" class="w-32 h-32 bg-stone-100 rounded-full border-2 border-dashed border-stone-300 flex items-center justify-center text-3xl text-stone-400 mb-3 cursor-pointer hover:border-stone-500 hover:bg-stone-200 transition overflow-hidden bg-cover bg-center">
+                            <span id="p-avatar-placeholder">📷</span>
+                        </div>
+                        <input type="file" id="p-avatar-upload" accept="image/png, image/jpeg, image/gif, image/webp, image/bmp, image/tiff" class="hidden" onchange="previewAvatar(this, 'p-avatar-preview')">
+                    </div>
+                    <p class="text-xs font-medium text-stone-900">Profile Image</p>
+                    <p class="text-[10px] text-stone-500 mt-1">JPG, PNG, GIF, WEBP, BMP, TIFF</p>
+                </div>
+
+                <!-- Form Col -->
+                <div class="col-span-2 space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">First Name</label>
+                            <input type="text" id="p-fname" class="w-full border-b border-stone-300 py-1 text-sm focus:border-stone-900 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Last Name</label>
+                            <input type="text" id="p-lname" class="w-full border-b border-stone-300 py-1 text-sm focus:border-stone-900 outline-none">
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Current Headline</label>
+                        <input type="text" id="p-role" class="w-full border-b border-stone-300 py-1 text-sm focus:border-stone-900 outline-none" placeholder="e.g. VP Engineering at FinTech Co" oninput="searchDesignations(this, 'p-role-results')">
+                        <div id="p-role-results" class="autocomplete-items hidden"></div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Company / Organization</label>
+                        <input type="text" id="p-company" class="w-full border-b border-stone-300 py-1 text-sm focus:border-stone-900 outline-none" oninput="searchCompanies(this, 'p-company-results')" onblur="validateCompany(this)">
+                        <div id="p-company-results" class="autocomplete-items hidden"></div>
+                        <p id="p-company-error" class="hidden text-[10px] text-red-600 mt-1">Please select a valid verified company.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-end mb-1">
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">Professional Bio</label>
+                            <button onclick="polishBio()" id="btn-polish" class="text-[10px] text-gold-600 font-medium hover:underline flex items-center gap-1">✨ AI Refine</button>
+                        </div>
+                        <textarea id="p-bio" rows="3" class="w-full bg-stone-50 border border-stone-200 rounded p-2 text-sm focus:border-stone-400 outline-none resize-none" placeholder="Briefly describe your expertise and current focus..."></textarea>
+                    </div>
+
+                    <div class="pt-4 flex justify-end">
+                        <button onclick="saveProfile()" class="bg-stone-900 text-white px-8 py-3 text-sm font-medium rounded-sm hover:bg-stone-800 transition shadow-lg">Proceed to Circle Selection &rarr;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 3: CIRCLE SELECTION -->
+    <div id="view-circles" class="absolute inset-0 z-40 bg-stone-100 flex flex-col items-center justify-center p-6 hidden overflow-y-auto">
+        <div class="max-w-6xl w-full">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-4xl text-stone-900 mb-3">Choose Your Boardroom</h2>
+                <p class="text-stone-500 text-sm max-w-lg mx-auto">Select your primary professional domain. This determines your peer group, access level, and daily intelligence briefing.</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-8" id="circles-container">
+                <!-- JS Populated -->
+            </div>
+
+            <div id="circle-confirm" class="fixed bottom-10 left-0 right-0 flex justify-center hidden pointer-events-none">
+                <button onclick="enterDashboard()" class="pointer-events-auto bg-stone-900 text-white px-10 py-4 text-sm font-medium rounded-full shadow-2xl hover:bg-stone-800 transition transform hover:-translate-y-1 flex items-center gap-3">
+                    Enter <span id="conf-circle-name" class="font-serif italic">Selected</span> Circle
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 4: MAIN DASHBOARD (THE BOARDROOM) -->
+    <div id="view-dashboard" class="flex h-full w-full hidden bg-stone-100">
+        <!-- Sidebar Navigation (Same as before) -->
+        <aside class="w-64 bg-white border-r border-stone-200 flex flex-col z-20">
+            <div class="p-6 border-b border-stone-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-stone-900 text-white flex items-center justify-center font-serif font-bold text-lg rounded-sm">T</div>
+                    <span class="font-serif font-bold text-lg text-stone-900 tracking-tight">TrustFirst</span>
+                </div>
+            </div>
+            
+            <div class="flex-1 py-6 px-3 space-y-1">
+                <button id="btn-nav-feed" onclick="setTab('feed')" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-md text-stone-600 text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                    The Boardroom
+                </button>
+                <button id="btn-nav-messages" onclick="setTab('messages')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-md text-stone-600 text-sm group">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    Messages
+                    <span class="ml-auto bg-stone-200 text-stone-700 text-[10px] px-2 py-0.5 rounded-full font-bold group-[.active]:bg-stone-900 group-[.active]:text-white">2</span>
+                </button>
+                <button id="btn-nav-network" onclick="setTab('network')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-md text-stone-600 text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    My Network <span id="network-count" class="ml-auto text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full hidden">0</span>
+                </button>
+                <button id="btn-nav-profile" onclick="setTab('profile')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-md text-stone-600 text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    Executive Profile
+                </button>
+            </div>
+
+            <div class="p-6 border-t border-stone-100 bg-stone-50">
+                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">My Trust Score</p>
+                <div class="flex items-end gap-2 mb-1">
+                    <span class="text-3xl font-serif text-stone-900 score-val" id="dash-score">750</span>
+                    <span class="text-xs text-green-600 font-medium mb-1">High Integrity</span>
+                </div>
+                <div class="w-full bg-stone-200 h-1 rounded-full overflow-hidden">
+                    <div class="bg-stone-800 h-full w-[75%]" id="score-bar"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER: CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto relative scroll-smooth" id="main-content">
+            <!-- Header -->
+            <header class="sticky top-0 bg-white/90 backdrop-blur border-b border-stone-200 px-8 py-4 z-10 flex justify-between items-center">
+                <div>
+                    <h2 class="font-serif text-xl text-stone-900" id="dash-circle-name">Founders' Table</h2>
+                    <p class="text-xs text-stone-500">Private Circle • 142 Members</p>
+                </div>
+                <div class="flex gap-4 items-center">
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="p-2 text-stone-400 hover:text-stone-900 relative transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full ring-2 ring-white"></span>
+                        </button>
+                        <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-stone-200 shadow-xl rounded-lg z-50 overflow-hidden">
+                            <div class="bg-stone-50 px-4 py-2 border-b border-stone-100 text-xs font-bold text-stone-500 uppercase tracking-wider">Notifications</div>
+                            <div id="notif-list" class="max-h-64 overflow-y-auto">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="openPostModal('article')" class="text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 px-4 py-2 rounded-sm shadow-sm flex items-center gap-2">
+                        <span>+</span> Create Post
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content Container -->
+            
+            <!-- FEED TAB -->
+            <div id="tab-feed" class="p-8 max-w-3xl mx-auto space-y-8 pb-20">
+                
+                <!-- Mobile Live Wire (Visible lg:hidden) -->
+                <div class="lg:hidden mb-8 bg-white border-l-4 border-red-600 shadow-sm rounded-r p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-serif text-lg text-stone-900 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse-slow"></span>
+                            Live Executive Wire
+                        </h3>
+                        <button onclick="openNewsConfig()" class="text-[10px] text-stone-400 uppercase font-bold">Config</button>
+                    </div>
+                    <div id="mobile-news-container" class="space-y-3">
+                        <div class="text-center py-4 text-stone-400 text-xs italic">Loading wire...</div>
+                    </div>
+                </div>
+
+                <!-- Daily Briefing (AI Generated) -->
+                <div class="bg-stone-800 text-stone-200 p-6 rounded-lg shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 text-9xl font-serif">"</div>
+                    <h3 class="font-serif text-lg text-white mb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> 
+                        Morning Intelligence
+                    </h3>
+                    <p class="text-sm leading-relaxed text-stone-300" id="briefing-text">Loading intelligence...</p>
+                </div>
+
+                <!-- Feed -->
+                <div id="feed-stream" class="space-y-6">
+                    <!-- Dynamic Posts -->
+                </div>
+            </div>
+
+            <!-- MESSAGES TAB -->
+            <div id="tab-messages" class="hidden h-[calc(100vh-64px)] flex flex-col md:flex-row bg-white">
+                <!-- Conversation List -->
+                <div class="w-full md:w-80 border-r border-stone-200 bg-stone-50 overflow-y-auto">
+                    <div class="p-4 border-b border-stone-200 sticky top-0 bg-stone-50 z-10">
+                         <h3 class="font-serif text-xl text-stone-900">Messages</h3>
+                    </div>
+                    <div id="conversation-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <!-- Chat Window -->
+                <div class="flex-1 flex flex-col bg-white">
+                    <div class="p-4 border-b border-stone-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center text-sm font-bold text-stone-600" id="chat-header-avatar"></div>
+                        <div>
+                            <h4 class="font-bold text-stone-900" id="chat-header-name">Select a conversation</h4>
+                            <p class="text-xs text-stone-500" id="chat-header-role"></p>
+                        </div>
+                    </div>
+                    
+                    <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 bg-stone-50/30">
+                        <!-- Messages go here -->
+                        <div class="flex justify-center h-full items-center text-stone-400 text-sm">Select a conversation to start chatting</div>
+                    </div>
+
+                    <div class="p-4 border-t border-stone-200 bg-white">
+                        <div class="flex gap-2">
+                            <input type="text" id="chat-input" class="flex-1 border border-stone-300 rounded p-2 text-sm outline-none focus:border-stone-900" placeholder="Type a message...">
+                            <button onclick="sendMessage()" class="bg-stone-900 text-white px-4 py-2 text-sm rounded hover:bg-stone-800">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NETWORK TAB -->
+            <div id="tab-network" class="hidden p-8 max-w-4xl mx-auto pb-20">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h3 class="font-serif text-2xl text-stone-900">My Professional Network</h3>
+                        <p class="text-stone-500 text-sm mt-1">Vetted peers and verified colleagues.</p>
+                    </div>
+                    <div class="relative">
+                        <input type="text" placeholder="Search connections..." class="pl-8 pr-4 py-2 border border-stone-200 rounded-full text-sm w-64 focus:border-stone-400 outline-none">
+                        <svg class="w-4 h-4 text-stone-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="network-grid">
+                    <!-- Network Cards Populated Here -->
+                </div>
+                
+                <div id="empty-network" class="hidden text-center py-12 border-2 border-dashed border-stone-200 rounded-lg">
+                    <p class="text-stone-400 mb-2">No connections yet.</p>
+                    <p class="text-stone-500 text-xs">Explore the sidebar for suggestions or wait for colleagues to join.</p>
+                </div>
+            </div>
+
+            <!-- PROFILE TAB -->
+            <div id="tab-profile" class="hidden p-8 max-w-4xl mx-auto pb-20">
+                <div class="bg-white border border-stone-200 rounded-lg p-8 shadow-sm mb-8 flex flex-col md:flex-row items-center md:items-start gap-8">
+                    <div class="w-32 h-32 bg-stone-200 rounded-full flex items-center justify-center text-4xl font-serif font-bold text-stone-600 flex-shrink-0 bg-cover bg-center overflow-hidden border-4 border-stone-200" id="dash-profile-initials"></div>
+                    <div class="flex-1 text-center md:text-left">
+                        <h2 class="font-serif text-3xl text-stone-900 mb-2" id="dash-profile-name">Alex V.</h2>
+                        <p class="text-lg text-stone-600" id="dash-profile-role">Executive</p>
+                        <p class="text-sm text-stone-500" id="dash-profile-company">Company</p>
+                        <p class="text-sm text-stone-500 mt-4 leading-relaxed max-w-lg" id="dash-profile-bio">Bio loading...</p>
+                        <div class="mt-6 flex gap-3 justify-center md:justify-start">
+                            <button onclick="toggleProfileEdit()" class="px-4 py-2 border border-stone-300 text-stone-700 text-sm rounded hover:bg-stone-50">Edit Profile</button>
+                            <button class="px-4 py-2 bg-stone-900 text-white text-sm rounded hover:bg-stone-800">Share Profile</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIMELINE SECTION -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-white border border-stone-200 rounded-lg p-6 shadow-sm">
+                            <h3 class="font-serif text-xl text-stone-900 mb-4 border-b border-stone-100 pb-2">Experience</h3>
+                            <div id="profile-exp-list" class="space-y-4"></div>
+                        </div>
+                        <div class="bg-white border border-stone-200 rounded-lg p-6 shadow-sm">
+                            <h3 class="font-serif text-xl text-stone-900 mb-4 border-b border-stone-100 pb-2">Education</h3>
+                            <div id="profile-edu-list" class="space-y-4"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white border border-stone-200 rounded-lg p-6 shadow-sm">
+                            <h3 class="font-serif text-lg text-stone-900 mb-3">Endorsements</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-xs bg-stone-100 text-stone-600 px-3 py-1 rounded-full">Leadership (12)</span>
+                                <span class="text-xs bg-stone-100 text-stone-600 px-3 py-1 rounded-full">Strategy (8)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EDIT PROFILE FORM (Hidden by default) -->
+                <div id="profile-edit-form" class="hidden fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-sm flex justify-end">
+                    <div class="w-full max-w-lg bg-white h-full shadow-2xl p-8 overflow-y-auto animate-slide-in">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-serif text-xl text-stone-900">Update Profile</h3>
+                            <button onclick="toggleProfileEdit()" class="text-stone-400 hover:text-stone-900 text-2xl">&times;</button>
+                        </div>
+
+                        <!-- RESUME PARSER -->
+                        <div class="mb-8 p-6 bg-stone-50 border border-dashed border-stone-300 rounded-lg text-center">
+                            <div class="mb-2 text-2xl">📄</div>
+                            <h4 class="font-medium text-stone-900 mb-1">Auto-fill from Resume</h4>
+                            <p class="text-xs text-stone-500 mb-4">Supports PDF, DOCX, TXT. Extracts experience & education.</p>
+                            <div class="flex flex-col gap-3 max-w-sm mx-auto">
+                                <label class="cursor-pointer bg-white hover:bg-stone-100 text-stone-600 text-xs py-2 px-4 rounded border border-stone-300 transition shadow-sm font-medium">
+                                    <span>Upload Resume File</span>
+                                    <input type="file" id="resume-upload-main" class="hidden" accept=".pdf,.docx,.txt" onchange="handleResumeUpload(this, false)">
+                                </label>
+                                <div id="parsing-status" class="hidden text-xs text-gold-600 animate-pulse font-medium">Parsing document...</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Avatar Upload in Edit -->
+                            <div class="flex justify-center mb-4">
+                                 <div class="relative group">
+                                    <div id="edit-avatar-preview" onclick="document.getElementById('edit-avatar-upload').click()" class="w-24 h-24 bg-stone-100 rounded-full border-2 border-dashed border-stone-300 flex items-center justify-center text-2xl text-stone-400 cursor-pointer hover:border-stone-500 hover:bg-stone-200 transition overflow-hidden bg-cover bg-center">
+                                        <span id="edit-avatar-placeholder">📷</span>
+                                    </div>
+                                    <input type="file" id="edit-avatar-upload" accept="image/png, image/jpeg, image/gif, image/webp, image/bmp, image/tiff" class="hidden" onchange="previewAvatar(this, 'edit-avatar-preview')">
+                                    <p class="text-[10px] text-center text-stone-500 mt-1">Change Photo</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-xs font-bold text-stone-500 uppercase">Name</label><input type="text" id="edit-name" class="w-full p-2 border border-stone-300 rounded text-sm mt-1"></div>
+                                <div><label class="text-xs font-bold text-stone-500 uppercase">Role</label><input type="text" id="edit-role" class="w-full p-2 border border-stone-300 rounded text-sm mt-1" oninput="searchDesignations(this, 'edit-role-results')">
+                                    <div id="edit-role-results" class="autocomplete-items hidden"></div>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <label class="text-xs font-bold text-stone-500 uppercase">Company</label>
+                                <input type="text" id="edit-company" class="w-full p-2 border border-stone-300 rounded text-sm mt-1" oninput="searchCompanies(this, 'edit-company-results')" onblur="validateCompany(this, 'edit-company-error')">
+                                <div id="edit-company-results" class="autocomplete-items hidden"></div>
+                                <p id="edit-company-error" class="hidden text-[10px] text-red-600 mt-1">Please select a valid verified company.</p>
+                            </div>
+                            <div><label class="text-xs font-bold text-stone-500 uppercase">Bio</label><textarea id="edit-bio" rows="4" class="w-full p-2 border border-stone-300 rounded text-sm mt-1"></textarea></div>
+                            
+                            <div class="border-t border-stone-100 pt-4">
+                                <p class="text-xs font-bold text-stone-500 uppercase mb-2">Parsed Experience (JSON)</p>
+                                <textarea id="edit-exp-json" rows="6" class="w-full p-2 border border-stone-300 rounded text-xs font-mono text-stone-600 bg-stone-50" placeholder="[]"></textarea>
+                                <p class="text-[10px] text-stone-400 mt-1">AI populates this. You can edit the JSON structure manually if needed.</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex justify-end gap-3">
+                            <button onclick="toggleProfileEdit()" class="px-4 py-2 text-sm text-stone-600">Cancel</button>
+                            <button onclick="saveProfileChanges()" class="px-6 py-2 bg-stone-900 text-white text-sm rounded hover:bg-stone-800">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- RIGHT: INTELLIGENCE SIDEBAR -->
+        <aside class="w-80 bg-stone-50 border-l border-stone-200 hidden lg:block p-6 overflow-y-auto">
+            <!-- LIVE EXECUTIVE WIRE WIDGET (DESKTOP) -->
+            <div class="mb-10 p-4 bg-white border-l-4 border-red-600 shadow-sm rounded-r">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-serif text-lg text-stone-900 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse-slow"></span>
+                        Live Wire
+                    </h3>
+                    <button onclick="openNewsConfig()" class="text-[10px] text-stone-400 hover:text-stone-900 uppercase font-bold tracking-wider">Config</button>
+                </div>
+                
+                <div id="news-container" class="space-y-4">
+                    <div class="text-center py-8 text-stone-400 text-xs italic">Connecting to wire...</div>
+                </div>
+                
+                <div class="mt-3 text-[10px] text-stone-400 text-right" id="news-timer">Updated just now</div>
+            </div>
+
+            <h3 class="font-serif text-lg text-stone-900 mb-6">Circle Intelligence</h3>
+            
+            <!-- Trending Topics -->
+            <div class="mb-8">
+                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-3">Trending Themes</p>
+                <div class="space-y-2">
+                    <div class="p-3 bg-white border border-stone-200 rounded-sm hover:border-stone-400 cursor-pointer transition">
+                        <span class="text-xs font-medium text-stone-900">#AI_Governance</span>
+                        <p class="text-[10px] text-stone-500 mt-1">12 Discussions this week</p>
+                    </div>
+                    <div class="p-3 bg-white border border-stone-200 rounded-sm hover:border-stone-400 cursor-pointer transition">
+                        <span class="text-xs font-medium text-stone-900">#SeriesB_Crunch</span>
+                        <p class="text-[10px] text-stone-500 mt-1">8 Discussions this week</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommended Peers -->
+            <div>
+                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-3">Suggested Peers</p>
+                <div class="space-y-3" id="peer-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- MODAL: NEWS CONFIG -->
+    <div id="modal-news" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded shadow-xl p-6">
+            <h3 class="font-serif text-xl text-stone-900 mb-4">Wire Intelligence Settings</h3>
+            <p class="text-sm text-stone-500 mb-4">Define the topics for your AI-curated news stream.</p>
+            <input type="text" id="news-interests-input" class="w-full border p-2 text-sm rounded mb-4" placeholder="e.g. Fintech, Crypto, Macroeconomics">
+            <div class="flex justify-end gap-2">
+                <button onclick="document.getElementById('modal-news').classList.add('hidden')" class="px-4 py-2 text-sm text-stone-600">Cancel</button>
+                <button onclick="saveNewsConfig()" class="px-4 py-2 bg-stone-900 text-white text-sm rounded">Update Stream</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: POST CREATOR -->
+    <div id="modal-post" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-stone-100 flex justify-between items-center">
+                <h3 class="font-serif text-xl text-stone-900">Create Post</h3>
+                <button onclick="closeModal()" class="text-stone-400 hover:text-stone-900 text-xl">&times;</button>
+            </div>
+            
+            <!-- Post Types -->
+            <div class="flex bg-stone-50 border-b border-stone-200 text-xs font-medium uppercase tracking-wide">
+                <button onclick="setType('memo')" id="type-memo" class="flex-1 py-3 text-stone-900 border-b-2 border-stone-900">Article</button>
+                <button onclick="setType('job')" id="type-job" class="flex-1 py-3 text-stone-500 border-b-2 border-transparent hover:bg-stone-100">Post Job</button>
+                <button onclick="setType('question')" id="type-question" class="flex-1 py-3 text-stone-500 border-b-2 border-transparent hover:bg-stone-100">Question</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1 space-y-4">
+                <input type="text" id="post-title" class="w-full text-2xl font-serif border-none outline-none placeholder-stone-300" placeholder="Headline">
+                
+                <!-- Dynamic Fields -->
+                <div id="job-fields" class="hidden grid grid-cols-2 gap-4 bg-stone-50 p-4 rounded border border-stone-200">
+                    <input type="text" id="job-comp" class="bg-transparent border-b border-stone-300 text-sm py-1 outline-none" placeholder="Company">
+                    <input type="text" id="job-loc" class="bg-transparent border-b border-stone-300 text-sm py-1 outline-none" placeholder="Location">
+                    <input type="text" id="job-role-field" class="bg-transparent border-b border-stone-300 text-sm py-1 outline-none col-span-2" placeholder="Role Title">
+                </div>
+
+                <textarea id="post-body" class="w-full text-stone-700 leading-relaxed border-none outline-none resize-none h-48" placeholder="Share your insight or context..."></textarea>
+                
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="aiEnhance()" id="btn-enhance" class="text-xs text-gold-600 hover:text-gold-700 flex items-center gap-1">✨ AI Polish Tone</button>
+                    <!-- NEW EXPAND BUTTON -->
+                    <button onclick="aiExpand()" id="btn-expand" class="text-xs text-stone-500 hover:text-stone-900 flex items-center gap-1">⚡ Expand Idea</button>
+                    <span class="text-xs text-stone-400" id="char-count">0 chars</span>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-stone-50 border-t border-stone-200 flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 text-sm text-stone-600 hover:text-stone-900">Cancel</button>
+                <button onclick="publishPost()" id="btn-publish" class="px-6 py-2 bg-stone-900 text-white text-sm font-medium rounded-sm hover:bg-stone-800">Publish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SMART CONNECT -->
+    <div id="modal-connect" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded shadow-xl p-6">
+            <h3 class="font-serif text-xl text-stone-900 mb-2">Request Introduction</h3>
+            <p class="text-sm text-stone-500 mb-4">Draft a personalized note to connect.</p>
+            
+            <textarea id="connect-message" rows="4" class="w-full border border-stone-300 rounded p-2 text-sm mb-4 resize-none focus:border-stone-500 outline-none" placeholder="Hi Sarah, I'd love to connect regarding..."></textarea>
+            
+            <div class="flex justify-between items-center">
+                <button onclick="aiDraftConnection()" id="btn-ai-connect" class="text-xs text-gold-600 hover:text-gold-700 font-medium">✨ AI Draft Intro</button>
+                <div class="flex gap-2">
+                    <button onclick="closeConnectModal()" class="px-4 py-2 text-sm text-stone-600">Cancel</button>
+                    <button onclick="sendConnectionRequest()" class="px-4 py-2 bg-stone-900 text-white text-sm rounded">Send Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        // --- NAVIGATION & AUTH ---
+        function toggleAuth(mode) {
+            const emailBtn = document.getElementById('tab-email'); const waBtn = document.getElementById('tab-wa');
+            const input = document.getElementById('auth-input');
+            const btn = document.getElementById('btn-auth-action');
+            if(mode === 'email') {
+                emailBtn.className = "flex-1 py-2 text-xs font-bold text-stone-900 border-b-2 border-stone-900 uppercase tracking-wide";
+                waBtn.className = "flex-1 py-2 text-xs font-bold text-stone-400 border-b-2 border-transparent hover:text-stone-600 uppercase tracking-wide";
+                input.placeholder = "name@gmail.com";
+                btn.innerText = "Send Gmail OTP";
+                btn.className = "w-full mt-4 bg-stone-900 text-white py-3 text-sm font-medium rounded-sm hover:bg-stone-800 transition";
+            } else {
+                waBtn.className = "flex-1 py-2 text-xs font-bold text-stone-900 border-b-2 border-stone-900 uppercase tracking-wide";
+                emailBtn.className = "flex-1 py-2 text-xs font-bold text-stone-400 border-b-2 border-transparent hover:text-stone-600 uppercase tracking-wide";
+                input.placeholder = "+1 (555) 000-0000";
+                btn.innerText = "Send WhatsApp OTP";
+                btn.className = "w-full mt-4 bg-green-600 text-white py-3 text-sm font-medium rounded-sm hover:bg-green-700 transition";
+            }
         }
 
-        // --- Cloudinary Configuration ---
-        const CLOUDINARY_CLOUD_NAME = 'dcxhenppn';
-        const CLOUDINARY_UPLOAD_PRESET = 'marketplace_preset';
+        function handleSignup() {
+            const val = document.getElementById('auth-input').value;
+            if(!val) return alert("Please enter your details.");
+            appState.user.email = val;
+            transition('view-landing', 'view-profile');
+        }
+
+        function handleGoogleLogin(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="loader border-stone-400 border-t-stone-700 mr-2"></span> Connecting...`;
+            
+            setTimeout(() => {
+                appState.user.email = "alex.executive@gmail.com";
+                // Pre-fill profile name if we assume Google provides it
+                const fname = document.getElementById('p-fname');
+                const lname = document.getElementById('p-lname');
+                if(fname) fname.value = "Alex";
+                if(lname) lname.value = "V.";
+                
+                transition('view-landing', 'view-profile');
+                btn.innerHTML = originalText;
+            }, 800);
+        }
+
+        // --- DASHBOARD NAVIGATION ---
+        function setTab(tabId) {
+            // Update Sidebar UI
+            ['feed', 'network', 'profile', 'messages'].forEach(t => {
+                const btn = document.getElementById(`btn-nav-${t}`);
+                if(btn) {
+                    if(t === tabId) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+                
+                const tab = document.getElementById(`tab-${t}`);
+                if(tab) {
+                    if(t === tabId) tab.classList.remove('hidden');
+                    else tab.classList.add('hidden');
+                }
+            });
+            
+            // If switching to specialized tabs, trigger their render logic
+            if (tabId === 'network') renderNetwork();
+            if (tabId === 'profile') renderProfileTab();
+            if (tabId === 'messages') renderMessagesTab();
+        }
+
+        // --- NOTIFICATIONS & MESSAGES ---
+        function toggleNotifications() {
+            const drop = document.getElementById('notification-dropdown');
+            drop.classList.toggle('hidden');
+            
+            const list = document.getElementById('notif-list');
+            list.innerHTML = appState.notifications.map(n => `
+                <div class="px-4 py-3 border-b border-stone-50 hover:bg-stone-50 cursor-pointer">
+                    <p class="text-sm text-stone-800">${n.text}</p>
+                    <p class="text-[10px] text-stone-400 mt-1">${n.time}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderMessagesTab() {
+            const list = document.getElementById('conversation-list');
+            list.innerHTML = appState.conversations.map(c => `
+                <div onclick="openConversation(${c.id})" class="p-4 border-b border-stone-100 hover:bg-white cursor-pointer transition ${c.id === appState.activeConversationId ? 'bg-white border-l-4 border-l-stone-900' : ''}">
+                    <div class="flex justify-between items-start mb-1">
+                        <h4 class="text-sm font-bold text-stone-900">${c.user}</h4>
+                        <span class="text-[10px] text-stone-400">${c.time}</span>
+                    </div>
+                    <p class="text-xs text-stone-500 truncate">${c.lastMessage}</p>
+                </div>
+            `).join('');
+            
+            openConversation(appState.activeConversationId);
+        }
+
+        function openConversation(id) {
+            appState.activeConversationId = id;
+            const conv = appState.conversations.find(c => c.id === id);
+            if(!conv) return;
+
+            // Update Header
+            document.getElementById('chat-header-avatar').innerText = conv.avatar;
+            document.getElementById('chat-header-name').innerText = conv.user;
+            document.getElementById('chat-header-role').innerText = conv.role;
+
+            // Render Messages
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = conv.messages.map(m => `
+                <div class="flex flex-col ${m.sender === 'You' ? 'items-end' : 'items-start'}">
+                    <div class="max-w-[70%] px-4 py-2 rounded-lg text-sm ${m.sender === 'You' ? 'bg-stone-900 text-white rounded-br-none' : 'bg-white border border-stone-200 text-stone-800 rounded-bl-none shadow-sm'}">
+                        ${m.text}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+            
+            // Re-render list to highlight active
+            const list = document.getElementById('conversation-list');
+            Array.from(list.children).forEach((child, index) => {
+                const c = appState.conversations[index];
+                if (c.id === id) {
+                    child.classList.add('bg-white', 'border-l-4', 'border-l-stone-900');
+                } else {
+                    child.classList.remove('bg-white', 'border-l-4', 'border-l-stone-900');
+                }
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value;
+            if(!text) return;
+            
+            const conv = appState.conversations.find(c => c.id === appState.activeConversationId);
+            conv.messages.push({ sender: 'You', text: text });
+            conv.lastMessage = text;
+            conv.time = "Just now";
+            
+            input.value = "";
+            renderMessagesTab(); // Refresh list to show new last message
+            openConversation(appState.activeConversationId); // Refresh chat view
+        }
+
+        // --- NEW CHAT FROM NETWORK ---
+        function startChat(name, role, avatar) {
+            // Check if conversation exists
+            let existingConv = appState.conversations.find(c => c.user === name);
+            
+            if (existingConv) {
+                appState.activeConversationId = existingConv.id;
+            } else {
+                // Create new conversation
+                const newId = appState.conversations.length + 1;
+                const initials = name.split(' ').map(n=>n[0]).join('');
+                const newConv = {
+                    id: newId,
+                    user: name,
+                    role: role,
+                    avatar: initials,
+                    lastMessage: "Start of conversation",
+                    time: "Now",
+                    messages: []
+                };
+                appState.conversations.unshift(newConv);
+                appState.activeConversationId = newId;
+            }
+            
+            setTab('messages');
+        }
+
+        // --- SMART CONNECT MODAL LOGIC ---
+        function connect(id) {
+            const person = mockDatabase.find(u => u.id === id);
+            if (!person) return;
+            appState.connectionTarget = person;
+            document.getElementById('modal-connect').classList.remove('hidden');
+            document.getElementById('connect-message').value = ""; // Clear previous
+        }
+
+        function closeConnectModal() {
+            document.getElementById('modal-connect').classList.add('hidden');
+            appState.connectionTarget = null;
+        }
+
+        async function aiDraftConnection() {
+            if (!appState.connectionTarget) return;
+            const target = appState.connectionTarget;
+            const user = appState.user;
+            
+            const prompt = `Draft a warm, professional connection request from ${user.name} (${user.role} at ${user.company}) to ${target.name} (${target.role} at ${target.company}). Keep it under 50 words.`;
+            
+            const result = await callGemini(prompt, 'btn-ai-connect');
+            if(result) document.getElementById('connect-message').value = result;
+        }
+
+        function sendConnectionRequest() {
+            const person = appState.connectionTarget;
+            if (person && !appState.network.find(n => n.id === person.id)) {
+                appState.network.push(person);
+                renderNetwork(); updateNetworkCount(); renderSuggestions();
+                alert(`Request sent to ${person.name}`);
+            }
+            closeConnectModal();
+        }
 
 
-        // --- Page Navigation Logic ---
-        let navigationHistory = [];
-        let postLoginAction = null;
+        // --- IMAGE & AUTOCOMPLETE LOGIC ---
+        function previewAvatar(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    appState.user.avatarUrl = e.target.result;
+                    const preview = document.getElementById(previewId);
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    preview.querySelector('span').style.display = 'none'; // Hide placeholder icon
+                    
+                    // Update main profile page avatar if editing
+                    if (previewId === 'edit-avatar-preview') {
+                        updateProfilePageAvatar(e.target.result);
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
 
-        const pageDivs = {
-            homepage: document.getElementById('homepage'),
-            listingpage: document.getElementById('listingpage'),
-            helppage: document.getElementById('helppage'),
-            placeholderpage: document.getElementById('placeholderpage'),
-            productdetailpage: document.getElementById('productdetailpage'),
-            comingsoonpage: document.getElementById('comingsoonpage'),
-            myadspage: document.getElementById('myadspage'),
-            userprofilepage: document.getElementById('userprofilepage'),
-            editprofilepage: document.getElementById('editprofilepage'),
-            premiumlistingpage: document.getElementById('premiumlistingpage'),
-            dashboardpage: document.getElementById('dashboardpage'),
-        };
-        const headers = {
-            loggedOut: document.getElementById('header-logged-out'),
-            loggedIn: document.getElementById('header-logged-in')
-        };
+        function updateProfilePageAvatar(url) {
+            const el = document.getElementById('dash-profile-initials');
+            if(el) {
+                el.innerText = "";
+                el.style.backgroundImage = `url(${url})`;
+            }
+        }
 
-        function showPage(pageName, isLoggedIn, isBack = false) {
-            let currentPage = '';
-            for (const [name, div] of Object.entries(pageDivs)) {
-                if (div && !div.classList.contains('hidden')) {
-                    currentPage = name;
-                    break;
+        function searchCompanies(input, resultsId) {
+            const val = input.value.toLowerCase();
+            const resultsDiv = document.getElementById(resultsId);
+            
+            if (!val || val.length < 3) {
+                resultsDiv.innerHTML = '';
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+
+            const matches = globalCompanies.filter(c => c.toLowerCase().includes(val));
+            
+            if (matches.length > 0) {
+                resultsDiv.innerHTML = matches.map(c => 
+                    `<div class="autocomplete-item" onclick="selectCompany('${c}', '${input.id}', '${resultsId}')">${c}</div>`
+                ).join('');
+                resultsDiv.classList.remove('hidden');
+            } else {
+                resultsDiv.classList.add('hidden');
+            }
+        }
+
+        function selectCompany(companyName, inputId, resultsId) {
+            document.getElementById(inputId).value = companyName;
+            document.getElementById(resultsId).classList.add('hidden');
+            validateCompany(document.getElementById(inputId), inputId === 'p-company' ? 'p-company-error' : 'edit-company-error');
+        }
+        
+        function searchDesignations(input, resultsId) {
+            const val = input.value.toLowerCase();
+            const resultsDiv = document.getElementById(resultsId);
+            
+            if (!val || val.length < 2) {
+                resultsDiv.innerHTML = '';
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+
+            const matches = globalDesignations.filter(d => d.toLowerCase().includes(val));
+            
+            if (matches.length > 0) {
+                resultsDiv.innerHTML = matches.map(d => 
+                    `<div class="autocomplete-item" onclick="selectDesignation('${d}', '${input.id}', '${resultsId}')">${d}</div>`
+                ).join('');
+                resultsDiv.classList.remove('hidden');
+            } else {
+                resultsDiv.classList.add('hidden');
+            }
+        }
+
+        function selectDesignation(designationName, inputId, resultsId) {
+            document.getElementById(inputId).value = designationName;
+            document.getElementById(resultsId).classList.add('hidden');
+        }
+        
+        function validateCompany(input, errorId = 'p-company-error') {
+            const val = input.value;
+            const errorEl = document.getElementById(errorId);
+            
+            if (!val) {
+                errorEl.classList.add('hidden');
+                return true;
+            }
+
+            // Strict check
+            const isValid = globalCompanies.includes(val);
+            
+            if (!isValid) {
+                errorEl.classList.remove('hidden');
+                input.classList.add('border-red-500');
+                input.classList.remove('border-stone-300');
+                return false;
+            } else {
+                errorEl.classList.add('hidden');
+                input.classList.remove('border-red-500');
+                input.classList.add('border-stone-300');
+                return true;
+            }
+        }
+
+        // Close autocomplete if clicked outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('input[id$="company"]') && !e.target.matches('input[id$="role"]')) {
+                document.querySelectorAll('.autocomplete-items').forEach(el => el.classList.add('hidden'));
+            }
+        });
+
+
+        // --- TRUST SCORE LOGIC ---
+        function updateTrustScore(points) {
+            appState.user.trustScore += points;
+            const scoreEl = document.getElementById('dash-score');
+            const barEl = document.getElementById('score-bar');
+            
+            scoreEl.innerText = appState.user.trustScore;
+            scoreEl.classList.remove('score-update'); // Reset animation
+            void scoreEl.offsetWidth; // Trigger reflow
+            scoreEl.classList.add('score-update');
+            
+            // Update bar width (assuming max 1000)
+            const percent = Math.min((appState.user.trustScore / 1000) * 100, 100);
+            barEl.style.width = `${percent}%`;
+        }
+
+        // --- PROFILE & RESUME PARSING ---
+        async function polishBio() {
+            const raw = document.getElementById('p-bio').value;
+            const role = document.getElementById('p-role').value;
+            if(!raw) return alert("Write a draft first.");
+            const refined = await callGemini(`Rewrite this professional bio to be executive, impactful and concise. Role: ${role}. Draft: "${raw}"`, 'btn-polish');
+            if(refined) document.getElementById('p-bio').value = refined;
+        }
+
+        function saveProfile() {
+            const fname = document.getElementById('p-fname').value;
+            const lname = document.getElementById('p-lname').value;
+            const companyInput = document.getElementById('p-company');
+            
+            if(!fname) return alert("Name is required.");
+            
+            // Validate Company before saving
+            if (!validateCompany(companyInput)) {
+                alert("Please select a valid company from the list.");
+                return;
+            }
+            
+            appState.user.name = `${fname} ${lname}`;
+            appState.user.role = document.getElementById('p-role').value;
+            appState.user.company = companyInput.value;
+            appState.user.bio = document.getElementById('p-bio').value;
+            
+            updateTrustScore(50); // +50 for profile completion
+            
+            // Render Circles
+            const container = document.getElementById('circles-container');
+            container.innerHTML = appState.circles.map(c => `
+                <div onclick="selectCircle('${c.id}')" id="c-${c.id}" class="circle-card bg-white p-6 rounded-lg border border-stone-200 cursor-pointer text-center relative">
+                    <div class="text-4xl mb-4">${c.icon}</div>
+                    <h3 class="font-serif text-xl text-stone-900 mb-2">${c.name}</h3>
+                    <p class="text-xs text-stone-500 leading-relaxed">${c.desc}</p>
+                    <div class="absolute top-3 right-3 w-2 h-2 bg-stone-900 rounded-full opacity-0 transition-opacity" id="check-${c.id}"></div>
+                </div>
+            `).join('');
+            
+            transition('view-profile', 'view-circles');
+        }
+
+        function renderProfileTab() {
+            document.getElementById('dash-profile-name').innerText = appState.user.name;
+            document.getElementById('dash-profile-role').innerText = appState.user.role;
+            document.getElementById('dash-profile-company').innerText = appState.user.company;
+            document.getElementById('dash-profile-bio').innerText = appState.user.bio || "No bio yet.";
+            
+            // Set Avatar
+            const avatarEl = document.getElementById('dash-profile-initials');
+            if (appState.user.avatarUrl) {
+                avatarEl.innerText = "";
+                avatarEl.style.backgroundImage = `url(${appState.user.avatarUrl})`;
+                // Add the frame color based on selected circle
+                if (appState.selectedCircle) {
+                    avatarEl.className = `w-32 h-32 rounded-full flex items-center justify-center text-4xl font-serif font-bold text-stone-600 flex-shrink-0 bg-cover bg-center overflow-hidden border-4 ${appState.selectedCircle.color}`;
+                }
+            } else {
+                avatarEl.style.backgroundImage = 'none';
+                avatarEl.innerText = appState.user.name.split(' ').map(n=>n[0]).join('');
+                if (appState.selectedCircle) {
+                    avatarEl.className = `w-32 h-32 rounded-full flex items-center justify-center text-4xl font-serif font-bold ${appState.selectedCircle.text} flex-shrink-0 bg-stone-200 overflow-hidden border-4 ${appState.selectedCircle.color}`;
                 }
             }
 
-            if (!isBack && currentPage && currentPage !== pageName) {
-                navigationHistory.push(currentPage);
-            }
-           
-            Object.values(pageDivs).forEach(div => { if(div) div.classList.add('hidden'); });
-            if (pageDivs[pageName]) pageDivs[pageName].classList.remove('hidden');
-
-            headers.loggedOut.classList.toggle('hidden', isLoggedIn);
-            headers.loggedIn.classList.toggle('hidden', !isLoggedIn);
-            window.scrollTo(0, 0);
-        }
-       
-        function goBack(event) {
-            if (event) event.preventDefault();
-            if (navigationHistory.length > 0) {
-                const previousPage = navigationHistory.pop();
-                const isLoggedIn = !headers.loggedIn.classList.contains('hidden');
-                showPage(previousPage, isLoggedIn, true);
+            // Render Experience
+            const expList = document.getElementById('profile-exp-list');
+            if (appState.user.experience && appState.user.experience.length > 0) {
+                expList.innerHTML = appState.user.experience.map(e => `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <h4 class="text-sm font-bold text-stone-900">${e.title}</h4>
+                        <p class="text-xs text-stone-600 font-medium">${e.company} • ${e.period}</p>
+                        <p class="text-xs text-stone-500 mt-1">${e.summary || ''}</p>
+                    </div>
+                `).join('');
             } else {
-                showHomepage(event);
+                expList.innerHTML = '<p class="text-stone-400 text-sm italic">No experience listed.</p>';
             }
-        }
 
-        function showHomepage(event) { if(event) event.preventDefault(); navigationHistory = []; showPage('homepage', !headers.loggedIn.classList.contains('hidden')); }
-        function showListingPage(event, categoryKey) { if(event) event.preventDefault(); showPage('listingpage', !headers.loggedIn.classList.contains('hidden')); updateListingPage(categoryKey); }
-        function showHelpPage(event) { if(event) event.preventDefault(); showPage('helppage', !headers.loggedIn.classList.contains('hidden')); }
-        function showPlaceholderPage(event) { if(event) event.preventDefault(); showPage('placeholderpage', true); }
-       
-        async function showProductDetailPage(event, adId) {
-            if (event) event.preventDefault();
-            const isLoggedIn = !document.getElementById('header-logged-in').classList.contains('hidden');
-            if (isLoggedIn) {
-                 await loadProductDetails(adId);
-                 showPage('productdetailpage', true);
+            // Render Education
+            const eduList = document.getElementById('profile-edu-list');
+            if (appState.user.education && appState.user.education.length > 0) {
+                eduList.innerHTML = appState.user.education.map(e => `
+                    <div class="mb-3 last:mb-0">
+                        <h4 class="text-sm font-bold text-stone-900">${e.institution}</h4>
+                        <p class="text-xs text-stone-600">${e.degree} • ${e.year}</p>
+                    </div>
+                `).join('');
             } else {
-                postLoginAction = () => showProductDetailPage(null, adId);
-                showLoginModal(event);
+                eduList.innerHTML = '<p class="text-stone-400 text-sm italic">No education listed.</p>';
             }
         }
 
-        function showComingSoonPage(event) { if(event) event.preventDefault(); showPage('comingsoonpage', !headers.loggedIn.classList.contains('hidden')); }
-       
-        async function showMyAdsPage(event) {
-            if(event) event.preventDefault();
-            await fetchAndDisplayMyAds(); // Fetch data before showing the page
-            showPage('myadspage', true);
-        }
-
-        function showUserProfilePage(event) { if(event) event.preventDefault(); showPage('userprofilepage', true); }
-        function showEditProfilePage(event) { if(event) event.preventDefault(); showPage('editprofilepage', true); }
-        function showPremiumListingPage(event) { if(event) event.preventDefault(); showPage('premiumlistingpage', !headers.loggedIn.classList.contains('hidden')); }
-        function showDashboardPage(event) { if(event) event.preventDefault(); showPage('dashboardpage', true); }
-       
-        function searchFromHome(event) {
-            if (event) event.preventDefault();
-            const locationValue = document.getElementById('location-search').value;
-            showListingPage(event, 'cars'); // Default to cars for search
-            document.getElementById('location-filter').value = locationValue;
-            alert(`Searching for items near "${locationValue}"`);
-        }
-
-        // --- Modal Control ---
-        function showSellModal(event) {
-            if(event) event.preventDefault();
-            const isLoggedIn = !document.getElementById('header-logged-in').classList.contains('hidden');
-            if (isLoggedIn) {
-                document.getElementById('sellModal').classList.remove('hidden');
-            } else {
-                postLoginAction = showSellModal;
-                showLoginModal(event);
+        function toggleProfileEdit() {
+            document.getElementById('profile-edit-form').classList.toggle('hidden');
+            // Pre-fill
+            if(!document.getElementById('profile-edit-form').classList.contains('hidden')) {
+                document.getElementById('edit-name').value = appState.user.name;
+                document.getElementById('edit-role').value = appState.user.role;
+                document.getElementById('edit-company').value = appState.user.company;
+                document.getElementById('edit-bio').value = appState.user.bio;
+                document.getElementById('edit-exp-json').value = JSON.stringify(appState.user.experience || [], null, 2);
+                
+                // Show avatar preview if exists
+                if(appState.user.avatarUrl) {
+                    const preview = document.getElementById('edit-avatar-preview');
+                    preview.style.backgroundImage = `url(${appState.user.avatarUrl})`;
+                    preview.querySelector('span').style.display = 'none';
+                }
             }
         }
-        function hideSellModal() {
-            document.getElementById('sellModal').classList.add('hidden');
-            // Reset state when modal is hidden
-            editingAdId = null;
-            document.getElementById('adForm').reset();
-            document.querySelector('#sellModal .text-2xl').textContent = 'Post Your Ad';
-            document.getElementById('post-ad-button').textContent = 'Post Now';
-        }
-        function showLoginModal(event) { if(event) event.preventDefault(); document.getElementById('loginModal').classList.remove('hidden'); }
-        function hideLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
-        function showTncModal(event) { if(event) event.preventDefault(); document.getElementById('tncModal').classList.remove('hidden'); }
-        function hideTncModal() { document.getElementById('tncModal').classList.add('hidden'); }
-        function showPostSuccessModal() { document.getElementById('adSuccessModal').classList.remove('hidden'); }
-        function hideAdSuccessModal() { document.getElementById('adSuccessModal').classList.add('hidden'); }
 
-        document.getElementById('adForm').addEventListener('submit', handleAdSubmit);
-       
-        // --- RERA Info ---
-        function showReraInfo() { alert('RERA stands for Real Estate Regulatory Authority. A RERA number is a unique identification number assigned to real estate projects, ensuring transparency and accountability from builders.'); }
+        async function handleResumeUpload(input, isInitialSetup) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('parsing-status');
+            if(statusDiv) statusDiv.classList.remove('hidden');
 
-        // --- Dynamic Form Logic ---
-        function generateYearOptions(start, end) {
-            let options = '<option value="">Select Year</option>';
-            for (let year = end; year >= start; year--) {
-                options += `<option value="${year}">${year}</option>`;
+            let text = "";
+            try {
+                if (file.name.endsWith('.pdf')) {
+                    text = await extractTextFromPDF(file);
+                } else if (file.name.endsWith('.docx')) {
+                    text = await extractTextFromDOCX(file);
+                } else {
+                    // Text file
+                    text = await file.text();
+                }
+                
+                await parseResumeText(text, isInitialSetup);
+            } catch (e) {
+                console.error(e);
+                alert("Error reading file. Please copy-paste text instead.");
+            } finally {
+                if(statusDiv) statusDiv.classList.add('hidden');
             }
-            return options;
         }
-        const yearDropdown = generateYearOptions(1990, 2025);
 
-        const attributeTemplates = {
-            cars: `<h3 class="text-xl font-bold text-gray-900 mb-4">Car Details</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="label-style">Brand*</label><select class="input-style w-full"><option>Maruti Suzuki</option><option>Hyundai</option><option>Tata</option><option>Mahindra</option><option>Kia</option><option>Toyota</option><option>Honda</option><option>Volkswagen</option><option>Skoda</option><option>MG</option><option>Renault</option><option>Nissan</option><option>Jeep</option><option>Citroen</option><option>Isuzu</option><option>Mercedes-Benz</option><option>BMW</option><option>Audi</option><option>Jaguar</option><option>Land Rover</option><option>Volvo</option><option>Other</option></select></div><div><label class="label-style">Model*</label><input type="text" placeholder="e.g., Swift, Creta, Nexon" class="input-style w-full"></div><div><label class="label-style">Variant*</label><input type="text" placeholder="e.g., VXI, SX, XZ+" class="input-style w-full"></div><div><label class="label-style">Year*</label><select class="input-style w-full">${yearDropdown}</select></div><div><label class="label-style">Fuel*</label><select class="input-style w-full"><option>Petrol</option><option>Diesel</option><option>CNG & Hybrids</option><option>Electric</option><option>LPG</option></select></div><div><label class="label-style">Transmission*</label><select class="input-style w-full"><option>Manual</option><option>Automatic</option></select></div><div><label class="label-style">KM Driven*</label><input type="number" placeholder="e.g., 25000" class="input-style w-full"></div><div><label class="label-style">No. of Owners*</label><select class="input-style w-full"><option>1st</option><option>2nd</option><option>3rd</option><option>4th+</option></select></div></div><div><label class="label-style">Condition</label><div class="flex space-x-4 mt-1"><label class="flex items-center"><input type="radio" name="condition" class="mr-2 h-4 w-4"
+        async function extractTextFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            let fullText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+            }
+            return fullText;
+        }
+
+        async function extractTextFromDOCX(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+            return result.value;
+        }
+
+        async function parseResumeText(text, isInitialSetup) {
+            if(!text) return;
+            const prompt = `Extract structured data from this resume. Return strictly valid JSON: 
+            {
+              "name": "Full Name",
+              "role": "Current Job Title",
+              "company": "Current Company Name",
+              "bio": "A professional summary (max 30 words)",
+              "experience": [ {"title": "Job Title", "company": "Company Name", "period": "Year-Year", "summary": "Short 1-line description"} ],
+              "education": [ {"degree": "Degree Name", "institution": "School Name", "year": "Year"} ]
+            }
+            Text: ${text.substring(0, 3000)}`;
+            
+            const result = await callGemini(prompt, null); // No button ID needed for file upload flow
+            
+            if(result) {
+                try {
+                    const cleanJson = result.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+                    const data = JSON.parse(cleanJson);
+                    
+                    if (isInitialSetup) {
+                        document.getElementById('p-fname').value = data.name ? data.name.split(' ')[0] : "";
+                        document.getElementById('p-lname').value = data.name ? data.name.split(' ').slice(1).join(' ') : "";
+                        document.getElementById('p-role').value = data.role || "";
+                        document.getElementById('p-company').value = data.company || "";
+                        document.getElementById('p-bio').value = data.bio || "";
+                        // Store complex data directly in state for later
+                        appState.user.experience = data.experience || [];
+                        appState.user.education = data.education || [];
+                    } else {
+                        // Editing mode
+                        document.getElementById('edit-name').value = data.name || "";
+                        document.getElementById('edit-role').value = data.role || "";
+                        document.getElementById('edit-company').value = data.company || "";
+                        document.getElementById('edit-bio').value = data.bio || "";
+                        document.getElementById('edit-exp-json').value = JSON.stringify(data.experience || [], null, 2);
+                        // Also update education silently in state as we don't have a JSON edit field for it in this simple view
+                        if(data.education) appState.user.education = data.education;
+                    }
+                    
+                    alert("Resume parsed successfully!");
+                } catch(e) {
+                    console.error(e);
+                    alert("AI processed the resume but returned invalid data format.");
+                }
+            }
+        }
+
+        function saveProfileChanges() {
+            appState.user.name = document.getElementById('edit-name').value;
+            appState.user.role = document.getElementById('edit-role').value;
+            const companyInput = document.getElementById('edit-company');
+            appState.user.company = companyInput.value;
+            appState.user.bio = document.getElementById('edit-bio').value;
+
+             // Validate Company before saving
+             if (!validateCompany(companyInput, 'edit-company-error')) {
+                alert("Please select a valid company from the list.");
+                return;
+            }
+            
+            try {
+                const exp = JSON.parse(document.getElementById('edit-exp-json').value);
+                appState.user.experience = exp;
+            } catch(e) {
+                alert("Invalid Experience JSON format.");
+                return;
+            }
+            
+            renderProfileTab();
+            toggleProfileEdit();
+        }
+
+        // --- CIRCLE SELECTION ---
+        function selectCircle(id) {
+            document.querySelectorAll('.circle-card').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('[id^="check-"]').forEach(el => el.classList.remove('opacity-100'));
+            
+            document.getElementById(`c-${id}`).classList.add('selected');
+            document.getElementById(`check-${id}`).classList.add('opacity-100');
+            
+            appState.selectedCircle = appState.circles.find(c => c.id === id);
+            document.getElementById('circle-confirm').classList.remove('hidden');
+            document.getElementById('conf-circle-name').innerText = appState.selectedCircle.name;
+        }
+
+        function enterDashboard() {
+            document.getElementById('dash-circle-name').innerText = appState.selectedCircle.name;
+            document.getElementById('briefing-text').innerText = appState.briefing;
+            
+            document.getElementById('dash-profile-name').innerText = appState.user.name;
+            document.getElementById('dash-profile-role').innerText = `${appState.user.role}, ${appState.user.company}`;
+            document.getElementById('dash-profile-initials').innerText = appState.user.name.split(' ').map(n=>n[0]).join('');
+
+            autoConnectColleagues();
+
+            // Seed Feed with Articles
+            const feed = document.getElementById('feed-stream');
+            feed.innerHTML = ''; 
+            seedBoardroomContent(); // NEW FUNCTION
+            
+            renderSuggestions();
+            startNewsWire();
+
+            transition('view-circles', 'view-dashboard');
+        }
+
+        // --- FEED POPULATION ---
+        function seedBoardroomContent() {
+            // 1. System Welcome (Privacy Protocols)
+            addFeedItem("System", "Moderator", "Welcome to the Boardroom", "You have been vetted and approved. This circle adheres to strict privacy protocols. Share insights, not sales pitches.", "memo", "System");
+
+            // 2. Self Article
+            addFeedItem(appState.user.name, appState.user.role, "My Thoughts on Market Shifts", "I've been observing some interesting trends in our sector...", "memo", "You");
+
+            // 3. Network Article (1st Degree)
+            addFeedItem("Sarah Jenkins", "VP Engineering", "Scaling Teams Remotely", "We successfully onboarded 50 engineers this quarter. Here is our playbook...", "memo", "1st");
+
+            // 4. Extended Network (2nd Degree)
+            addFeedItem("Michael Chen", "Product Strategy", "The Future of PLG", "Product-led growth isn't dead, but the metrics are changing...", "memo", "2nd");
+        }
+
+        function addFeedItem(name, role, title, body, type, badgeLabel) {
+            const id = Date.now() + Math.random(); 
+            const initials = name.split(' ').map(n=>n[0]).join('');
+            
+            let tag = ""; 
+            if(type === 'job') tag = `<span class="bg-stone-200 text-stone-700 text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wide">Hiring</span>`; 
+            if(type === 'question') tag = `<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-wide">Question</span>`;
+            
+            // Relationship Badge Logic
+            let relBadge = "";
+            if (badgeLabel) {
+                let badgeColor = "bg-stone-100 text-stone-500";
+                if (badgeLabel === "You") badgeColor = "bg-stone-800 text-white";
+                if (badgeLabel === "1st") badgeColor = "bg-green-100 text-green-700";
+                if (badgeLabel === "2nd") badgeColor = "bg-blue-50 text-blue-600";
+                
+                relBadge = `<span class="${badgeColor} text-[9px] px-1.5 py-0.5 rounded ml-2 font-bold uppercase tracking-wider border border-stone-200">${badgeLabel}</span>`;
+            }
+
+            const html = `
+            <article class="bg-white border border-stone-200 rounded-lg p-6 shadow-sm fade-in relative group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-stone-800 text-white flex items-center justify-center text-xs font-bold font-serif">${initials}</div>
+                        <div>
+                            <div class="flex items-center">
+                                <p class="text-sm font-bold text-stone-900">${name}</p>
+                                ${relBadge}
+                            </div>
+                            <p class="text-[10px] text-stone-500 uppercase tracking-wide">${role}</p>
+                        </div>
+                    </div>
+                    ${tag}
+                </div>
+                
+                <h4 class="font-serif text-xl text-stone-900 mb-3 leading-tight">${title}</h4>
+                <div class="text-stone-600 text-sm leading-relaxed whitespace-pre-wrap font-sans">${body}</div>
+                
+                <div class="mt-6 pt-4 border-t border-stone-100 flex items-center gap-6">
+                    <div class="relative reaction-trigger">
+                        <button class="action-btn" id="btn-react-${id}">👍 Vouch</button>
+                        <div class="reaction-dock">
+                            <span class="reaction-emoji" onclick="react('${id}', '👍')">👍</span>
+                            <span class="reaction-emoji" onclick="react('${id}', '💡')">💡</span>
+                            <span class="reaction-emoji" onclick="react('${id}', '🎯')">🎯</span>
+                            <span class="reaction-emoji" onclick="react('${id}', '🤝')">🤝</span>
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="toggleComments('${id}')">💬 Discuss</button>
+                    <button class="action-btn ml-auto" onclick="alert('Post reported.')">🚩</button>
+                </div>
+
+                <div id="comments-${id}" class="hidden mt-4 bg-stone-50 p-4 rounded border border-stone-100">
+                    <div class="flex gap-2">
+                        <input type="text" id="inp-com-${id}" class="flex-1 bg-white border border-stone-300 rounded px-3 py-1 text-sm outline-none" placeholder="Add a professional perspective...">
+                        <button onclick="aiComment('${id}')" id="btn-ai-${id}" class="text-xs bg-white border border-stone-300 px-3 rounded hover:bg-stone-100">✨</button>
+                        <button onclick="addComment('${id}')" class="text-xs bg-stone-900 text-white px-3 rounded">Post</button>
+                    </div>
+                    <div id="list-com-${id}" class="mt-3 space-y-2"></div>
+                </div>
+            </article>`;
+            
+            const feed = document.getElementById('feed-stream');
+            feed.insertAdjacentHTML('afterbegin', html);
+        }
+
+        // --- NETWORK LOGIC ---
+        function autoConnectColleagues() {
+            const email = appState.user.email;
+            if (!email.includes('@')) return;
+            const domain = email.split('@')[1];
+            const colleagues = mockDatabase.filter(u => u.domain === domain && u.email !== email);
+            if (colleagues.length > 0) {
+                appState.network = [...appState.network, ...colleagues];
+                alert(`We found ${colleagues.length} colleagues from ${domain} and added them to your network.`);
+                renderNetwork(); updateNetworkCount();
+            }
+        }
+
+        function connect(id) {
+            const person = mockDatabase.find(u => u.id === id);
+            if (person && !appState.network.find(n => n.id === id)) {
+                appState.network.push(person);
+                renderNetwork(); updateNetworkCount(); renderSuggestions();
+                alert(`Connected with ${person.name}`);
+            }
+        }
+
+        function renderNetwork() {
+            const grid = document.getElementById('network-grid');
+            const emptyState = document.getElementById('empty-network');
+            if (appState.network.length === 0) { grid.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
+            emptyState.classList.add('hidden');
+            grid.innerHTML = appState.network.map(p => `
+                <div class="bg-white p-4 rounded-lg border border-stone-200 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 bg-stone-200 rounded-full flex items-center justify-center text-sm font-bold text-stone-600">${p.name.split(' ').map(n=>n[0]).join('')}</div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-stone-900 text-sm truncate">${p.name}</h4>
+                        <p class="text-xs text-stone-500 truncate">${p.role} at ${p.company}</p>
+                        <p class="text-[10px] text-stone-400 mt-1">${p.domain === appState.user.email.split('@')[1] ? '🏢 Colleague' : '🤝 Network'}</p>
+                    </div>
+                    <button class="text-stone-400 hover:text-stone-900" title="Message" onclick="startChat('${p.name}', '${p.role}', '${p.name.split(' ').map(n=>n[0]).join('')}')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderSuggestions() {
+            const suggestions = mockDatabase.filter(u => !appState.network.find(n => n.id === u.id) && u.email !== appState.user.email).slice(0, 3);
+            document.getElementById('peer-list').innerHTML = suggestions.map(p => `<div class="flex items-center gap-3 p-2 hover:bg-stone-100 rounded cursor-pointer group"><div class="w-8 h-8 bg-stone-200 rounded-full flex items-center justify-center text-xs font-bold text-stone-600">${p.name.split(' ').map(n=>n[0]).join('')}</div><div class="flex-1"><p class="text-xs font-bold text-stone-900">${p.name}</p><p class="text-[10px] text-stone-500 truncate w-32">${p.role} at ${p.company}</p></div><button onclick="connect(${p.id})" class="text-[10px] text-stone-500 hover:text-stone-900 border border-stone-200 px-2 py-1 rounded bg-white hover:bg-stone-50 transition">Connect</button></div>`).join('');
+        }
+
+        function updateNetworkCount() {
+            const count = appState.network.length;
+            const badge = document.getElementById('network-count');
+            badge.innerText = count; badge.classList.remove('hidden');
+        }
+
+        // --- NEWS WIRE LOGIC ---
+        function startNewsWire() {
+            refreshNews();
+            setInterval(refreshNews, 900000);
+            startTimerCountdown();
+        }
+
+        async function refreshNews() {
+            const render = (html) => {
+                ['news-container', 'mobile-news-container'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerHTML = html;
+                });
+            };
+            
+            render(`<div class="text-center py-4"><span class="loader"></span></div>`);
+            
+            const interests = appState.newsInterests;
+            const url = `https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=${encodeURIComponent(interests + ' business')}&hl=en-US&gl=US&ceid=US:en`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if(data.items && data.items.length > 0) {
+                    const headlines = data.items.slice(0, 10).map(i => i.title).join("\n");
+                    const prompt = `Act as an executive editor. Filter out clickbait and noise. Select the top 3 most credible, high-impact market/business updates from these headlines. Summarize them into concise bullet points (max 10 words). \n\n${headlines}`;
+                    const summary = await callGemini(prompt, null);
+                    
+                    if(summary) {
+                        const bullets = summary.split('\n').filter(l => l.trim().length > 0).slice(0,3);
+                        render(bullets.map(b => `<div class="flex gap-2 items-start group"><span class="text-gold-600 mt-1.5 text-[8px] flex-shrink-0">●</span><p class="text-xs text-stone-600 leading-snug group-hover:text-stone-900 transition">${b.replace(/^-|\*/g, '').trim()}</p></div>`).join(''));
+                    } else {
+                        render(generateRawNewsHTML(data.items.slice(0,3)));
+                    }
+                } else {
+                    render(`<div class="text-xs text-stone-400 text-center">No wire updates.</div>`);
+                }
+            } catch(e) {
+                render(getSimulatedNews());
+            }
+            resetTimer();
+        }
+
+        function generateRawNewsHTML(items) {
+            return items.map(item => `<div class="flex gap-2 items-start"><span class="text-gold-600 mt-1.5 text-[8px] flex-shrink-0">●</span><a href="${item.link}" target="_blank" class="text-xs text-stone-600 leading-snug hover:text-stone-900 truncate block w-full">${item.title}</a></div>`).join('');
+        }
+
+        function getSimulatedNews() {
+            return `<div class="flex gap-2 items-start group"><span class="text-gold-600 mt-1.5 text-[8px] flex-shrink-0">●</span><p class="text-xs text-stone-600 leading-snug group-hover:text-stone-900">Fed signals potential rate cuts in Q3.</p></div><div class="flex gap-2 items-start group"><span class="text-gold-600 mt-1.5 text-[8px] flex-shrink-0">●</span><p class="text-xs text-stone-600 leading-snug group-hover:text-stone-900">Tech sector rallies on new AI breakthroughs.</p></div><div class="flex gap-2 items-start group"><span class="text-gold-600 mt-1.5 text-[8px] flex-shrink-0">●</span><p class="text-xs text-stone-600 leading-snug group-hover:text-stone-900">Global supply chains stabilizing post-disruption.</p></div>`;
+        }
+
+        let nextUpdate = Date.now() + 900000;
+        function resetTimer() {
+            nextUpdate = Date.now() + 900000;
+            const timer = document.getElementById('news-timer');
+            if(timer) timer.innerText = "Just updated";
+        }
+
+        function startTimerCountdown() {
+            setInterval(() => {
+                const left = Math.max(0, Math.ceil((nextUpdate - Date.now()) / 60000));
+                const timer = document.getElementById('news-timer');
+                if (timer && left > 0 && left < 15) timer.innerText = `Refreshes in ${left}m`;
+            }, 60000);
+        }
+
+        function openNewsConfig() { document.getElementById('news-interests-input').value = appState.newsInterests; document.getElementById('modal-news').classList.remove('hidden'); }
+        function saveNewsConfig() { const val = document.getElementById('news-interests-input').value; if(val) { appState.newsInterests = val; document.getElementById('modal-news').classList.add('hidden'); refreshNews(); } }
+
+        // --- FEED & POSTING ---
+        let postType = 'memo';
+        function openPostModal(type) { document.getElementById('modal-post').classList.remove('hidden'); setType(type || 'memo'); }
+        function closeModal() { document.getElementById('modal-post').classList.add('hidden'); }
+        
+        function setType(t) {
+            postType = t;
+            ['memo', 'question', 'job'].forEach(k => {
+                const el = document.getElementById(`type-${k}`);
+                if(k === t) { el.classList.add('text-stone-900', 'border-stone-900'); el.classList.remove('text-stone-500', 'border-transparent'); }
+                else { el.classList.remove('text-stone-900', 'border-stone-900'); el.classList.add('text-stone-500', 'border-transparent'); }
+            });
+            const jobFields = document.getElementById('job-fields'); const titleInput = document.getElementById('post-title');
+            if(t === 'job') { jobFields.classList.remove('hidden'); titleInput.placeholder = "Role Title (e.g. Chief of Staff)"; } 
+            else if (t === 'question') { jobFields.classList.add('hidden'); titleInput.placeholder = "Strategic Question (e.g. How are you handling X?)"; } 
+            else { jobFields.classList.add('hidden'); titleInput.placeholder = "Memo Headline"; }
+        }
+
+        async function aiEnhance() { const body = document.getElementById('post-body').value; if(!body) return; const res = await callGemini(`Improve professional tone. Text: "${body}"`, 'btn-enhance'); if(res) document.getElementById('post-body').value = res; }
+        
+        // AI Expand Logic
+        async function aiExpand() {
+            const body = document.getElementById('post-body').value;
+            if(!body) return alert("Write a draft bullet point first.");
+            
+            const prompt = `Expand this rough idea into a structured executive memo (max 3 short paragraphs). Include: 1. Core Problem, 2. Analysis/Insight, 3. Strategic Implication. Tone: Professional, direct. Text: "${body}"`;
+            
+            const res = await callGemini(prompt, 'btn-expand');
+            if(res) document.getElementById('post-body').value = res;
+        }
+
+        async function aiSpark() { const res = await callGemini(`Generate a trending discussion topic for ${appState.selectedCircle.name}. JSON {title, body}`, 'btn-spark'); try { const json = JSON.parse(res.replace(/```json|```/g, '')); openPostModal('question'); document.getElementById('post-title').value = json.title; document.getElementById('post-body').value = json.body; } catch(e) {} }
+
+        async function publishPost() {
+            const title = document.getElementById('post-title').value; const body = document.getElementById('post-body').value; if(!title) return;
+            const btn = document.getElementById('btn-publish'); const oldTxt = btn.innerText; btn.disabled = true; btn.innerText = "Vetting...";
+            const safety = await callGemini(`Check abuse. Text: "${title} ${body}". JSON {safe: boolean, reason: string}`, null);
+            try { 
+                const cleanJson = safety.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+                const check = JSON.parse(cleanJson);
+                if(!check.safe) { 
+                    alert("Blocked: " + check.reason); 
+                    btn.disabled = false; 
+                    btn.innerText = oldTxt; 
+                    return; 
+                } 
+            } catch(e) { console.log(e); }
+            btn.disabled = false; btn.innerText = oldTxt; 
+            
+            // Add post with 'You' badge and update trust score
+            addFeedItem(appState.user.name, appState.user.role, title, body, postType, "You"); 
+            updateTrustScore(10);
+            
+            closeModal();
+            document.getElementById('post-title').value = ""; document.getElementById('post-body').value = "";
+        }
+
+        // --- INTERACTIONS ---
+        function react(id, emoji) { 
+            document.getElementById(`btn-react-${id}`).innerHTML = `${emoji} Vouched`; 
+            document.getElementById(`btn-react-${id}`).classList.add('text-gold-600');
+            // Reaction gives minimal points, or maybe to the author? Simulating user engagement points for now.
+            updateTrustScore(2);
+        }
+        function toggleComments(id) { document.getElementById(`comments-${id}`).classList.toggle('hidden'); }
+        async function aiComment(id) { const res = await callGemini("Draft professional comment. Max 1 sentence.", `btn-ai-${id}`); if(res) document.getElementById(`inp-com-${id}`).value = res; }
+        function addComment(id) { 
+            const txt = document.getElementById(`inp-com-${id}`).value; if(!txt) return; 
+            const html = `<div class="flex gap-2 text-xs"><span class="font-bold text-stone-900">${appState.user.name}</span><span class="text-stone-600">${txt}</span></div>`; 
+            document.getElementById(`list-com-${id}`).insertAdjacentHTML('beforeend', html); 
+            document.getElementById(`inp-com-${id}`).value = ""; 
+            updateTrustScore(5);
+        }
+
+        // --- UTILS ---
+        function transition(from, to) { const f = document.getElementById(from); const t = document.getElementById(to); f.style.opacity = '0'; setTimeout(() => { f.classList.add('hidden'); t.classList.remove('hidden'); void t.offsetWidth; t.classList.add('fade-in'); }, 500); }
+    </script>
+</body>
+</html>
