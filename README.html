@@ -17,8 +17,25 @@
             theme: {
                 extend: {
                     colors: {
-                        stone: { 50: '#fafaf9', 100: '#f5f5f4', 200: '#e7e5e4', 300: '#d6d3d1', 400: '#a8a29e', 500: '#78716c', 600: '#57534e', 700: '#44403c', 800: '#292524', 900: '#1c1917' },
-                        gold: { 500: '#b45309', 600: '#92400e', 700: '#78350f' }
+                        // Swapped 'Stone' (Warm) for 'Slate' (Cool Professional)
+                        stone: { 
+                            50: '#f8fafc', 
+                            100: '#f1f5f9', 
+                            200: '#e2e8f0', 
+                            300: '#cbd5e1', 
+                            400: '#94a3b8', 
+                            500: '#64748b', 
+                            600: '#475569', 
+                            700: '#334155', 
+                            800: '#1e293b', 
+                            900: '#0f172a' 
+                        },
+                        // Swapped 'Gold' for 'Trust Blue'
+                        gold: { 
+                            500: '#2563eb', // Blue 600
+                            600: '#1d4ed8', // Blue 700
+                            700: '#1e40af'  // Blue 800
+                        }
                     },
                     fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] },
                     boxShadow: { 'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)', 'card': '0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02)' },
@@ -31,45 +48,46 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
     <style>
-        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; }
         .font-serif { font-family: 'Playfair Display', serif; }
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
-        .glass-panel { background: rgba(255, 255, 255, 0.95); border: 1px solid #e7e5e4; backdrop-filter: blur(8px); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); border: 1px solid #e2e8f0; backdrop-filter: blur(8px); }
         .nav-item { transition: all 0.2s ease; border-left: 3px solid transparent; }
-        .nav-item:hover, .nav-item.active { background-color: #e7e5e4; border-left-color: #1c1917; color: #000; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background-color: #e2e8f0; border-left-color: #0f172a; color: #0f172a; font-weight: 600; }
         .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .circle-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .circle-card:hover { transform: translateY(-4px); border-color: #a8a29e; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
-        .circle-card.selected { border-color: #1c1917; background-color: #fafaf9; ring: 1px solid #1c1917; }
-        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #44403c; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; display: inline-block; }
+        .circle-card:hover { transform: translateY(-4px); border-color: #2563eb; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1); }
+        .circle-card.selected { border-color: #0f172a; background-color: #f8fafc; ring: 1px solid #0f172a; }
+        .loader { border: 2px solid #f1f5f9; border-top: 2px solid #0f172a; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .action-btn { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 500; color: #57534e; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; }
-        .action-btn:hover { background-color: #f5f5f4; color: #1c1917; }
+        .action-btn { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 500; color: #64748b; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; }
+        .action-btn:hover { background-color: #f1f5f9; color: #0f172a; }
         .reaction-trigger:hover .reaction-dock { display: flex; animation: dockUp 0.2s ease-out forwards; }
-        .reaction-dock { display: none; position: absolute; bottom: 100%; left: 0; margin-bottom: 8px; background: white; padding: 4px 8px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e7e5e4; gap: 4px; z-index: 50; }
+        .reaction-dock { display: none; position: absolute; bottom: 100%; left: 0; margin-bottom: 8px; background: white; padding: 4px 8px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; gap: 4px; z-index: 50; }
         @keyframes dockUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .reaction-emoji { font-size: 1.25rem; transition: transform 0.1s; cursor: pointer; padding: 2px; }
         .reaction-emoji:hover { transform: scale(1.3); }
         
         /* Timeline Styles */
-        .timeline-item { position: relative; padding-left: 24px; border-left: 2px solid #e7e5e4; padding-bottom: 24px; }
+        .timeline-item { position: relative; padding-left: 24px; border-left: 2px solid #e2e8f0; padding-bottom: 24px; }
         .timeline-item:last-child { border-left: none; }
-        .timeline-dot { position: absolute; left: -5px; top: 0; width: 8px; height: 8px; background-color: #a8a29e; border-radius: 50%; }
-        .timeline-item:hover .timeline-dot { background-color: #1c1917; transform: scale(1.2); transition: all 0.2s; }
+        .timeline-dot { position: absolute; left: -5px; top: 0; width: 8px; height: 8px; background-color: #64748b; border-radius: 50%; }
+        .timeline-item:hover .timeline-dot { background-color: #0f172a; transform: scale(1.2); transition: all 0.2s; }
 
         /* Trust Score Animation */
-        @keyframes scoreFlash { 0% { color: #1c1917; } 50% { color: #16a34a; transform: scale(1.1); } 100% { color: #1c1917; transform: scale(1); } }
+        @keyframes scoreFlash { 0% { color: #0f172a; } 50% { color: #16a34a; transform: scale(1.1); } 100% { color: #0f172a; transform: scale(1); } }
         .score-update { animation: scoreFlash 0.5s ease-in-out; }
 
         /* Autocomplete */
-        .autocomplete-items { position: absolute; border: 1px solid #d6d3d1; border-top: none; z-index: 99; top: 100%; left: 0; right: 0; border-radius: 0 0 4px 4px; background-color: white; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .autocomplete-item { padding: 10px; cursor: pointer; background-color: #fff; border-bottom: 1px solid #f5f5f4; font-size: 0.875rem; }
-        .autocomplete-item:hover { background-color: #f5f5f4; }
+        .autocomplete-items { position: absolute; border: 1px solid #cbd5e1; border-top: none; z-index: 99; top: 100%; left: 0; right: 0; border-radius: 0 0 4px 4px; background-color: white; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .autocomplete-item { padding: 10px; cursor: pointer; background-color: #fff; border-bottom: 1px solid #f1f5f9; font-size: 0.875rem; }
+        .autocomplete-item:hover { background-color: #f1f5f9; }
+        .autocomplete-active { background-color: #e2e8f0 !important; color: #0f172a; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden selection:bg-stone-200 selection:text-black">
+<body class="h-screen flex flex-col overflow-hidden selection:bg-blue-100 selection:text-blue-900">
 
     <!-- APP STATE & LOGIC -->
     <script>
